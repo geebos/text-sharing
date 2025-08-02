@@ -46,8 +46,7 @@ export default function TextView() {
 
       // 如果是二维码类型，生成二维码
       if (data.displayType === 'qrcode') {
-        const currentUrl = window.location.href;
-        const qrCodeDataURL = await QRCode.toDataURL(currentUrl);
+        const qrCodeDataURL = await QRCode.toDataURL(data.text);
         setQrCode(qrCodeDataURL);
       }
       
@@ -182,7 +181,7 @@ export default function TextView() {
                   <label className="block text-sm font-medium text-gray-700 mb-3">
                     分享二维码
                   </label>
-                  <div className="inline-block p-4 bg-white border border-gray-300 rounded-md">
+                  <div className="inline-block p-1 bg-white border border-gray-300 rounded-md">
                     <img 
                       src={qrCode} 
                       alt="分享二维码" 
@@ -190,7 +189,7 @@ export default function TextView() {
                     />
                   </div>
                   <p className="text-sm text-gray-500 mt-2">
-                    扫描二维码访问此页面
+                    扫描二维码获取文本内容
                   </p>
                 </div>
               )}
