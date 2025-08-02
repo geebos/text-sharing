@@ -4,6 +4,7 @@ import QRCode from 'qrcode';
 
 interface TextData {
   text: string;
+  userName: string;
   displayType: 'text' | 'qrcode';
   createdAt: string;
   expiresAt: string;
@@ -130,7 +131,9 @@ export default function TextView() {
         <div className="bg-white rounded-lg shadow-md p-6">
           {/* 头部信息 */}
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">分享的文本</h1>
+            <h1 className="text-2xl font-bold text-gray-800">
+              {textData?.userName ? `${textData.userName} 分享的文本` : '分享的文本'}
+            </h1>
             <button
               onClick={() => router.push('/')}
               className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"

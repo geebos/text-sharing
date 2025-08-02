@@ -10,15 +10,16 @@ export default async function handler(
   }
 
   try {
-    const { text, expiryTime, displayType } = req.body;
+    const { text, userName, expiryTime, displayType } = req.body;
 
     // 验证输入
     if (!text || typeof text !== 'string') {
       return res.status(400).json({ error: '文本内容不能为空' });
     }
 
-    if (text.length > 10000) {
-      return res.status(400).json({ error: '文本长度不能超过10000个字符' });
+    const maxLength = parseInt(process.env.NEXT_PUBLIC_MAX_TEXT_LENGTH || '200');
+    if (text.length > maxLength) {
+      return res.status(400).json({ error: `文本长度不能超过${maxLength}个字符` });
     }
 
     if (!expiryTime || !['1day', '7days', '30days'].includes(expiryTime)) {
@@ -27,6 +28,11 @@ export default async function handler(
 
     if (!displayType || !['text', 'qrcode'].includes(displayType)) {
       return res.status(400).json({ error: '无效的展示类型' });
+    }
+
+    // 验证用户名称（可选）
+    if (userName && (typeof userName !== 'string' || userName.length > 50)) {
+      return res.status(400).json({ error: '用户名称长度不能超过50个字符' });
     }
 
     // 生成唯一ID
@@ -41,6 +47,7 @@ export default async function handler(
     // 准备存储的数据
     const data = {
       text,
+      userName: userName?.trim() || '',
       displayType,
       createdAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + getExpirySeconds(expiryTime) * 1000).toISOString()
