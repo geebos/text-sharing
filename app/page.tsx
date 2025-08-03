@@ -3,14 +3,17 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import QRCode from 'qrcode';
+import { useForm, getFormProps, getInputProps, getTextareaProps } from '@conform-to/react';
+import { parseWithZod } from '@conform-to/zod/v4';
+import { CreateTextSchema } from '@/service/schema';
 
 // 分享历史数据结构（用于统计显示）
 interface ShareHistory {
-  id: string;
-  title: string;
-  userName: string;
-  createdAt: string;
-  expiresAt: string;
+  id: string
+  title: string
+  userName: string
+  createdAt: string
+  expiresAt: string
 }
 
 // 分享历史管理函数
@@ -39,10 +42,6 @@ const addToHistory = (item: ShareHistory) => {
 
 export default function Home() {
   const router = useRouter();
-  const [text, setText] = useState('');
-  const [userName, setUserName] = useState('');
-  const [expiryTime, setExpiryTime] = useState('1day');
-  const [displayType, setDisplayType] = useState('text');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<{
     id: string;
@@ -51,8 +50,22 @@ export default function Home() {
   } | null>(null);
   const [copySuccess, setCopySuccess] = useState('');
   const [shareHistory, setShareHistory] = useState<ShareHistory[]>([]);
+  const [formKey, setFormKey] = useState(0); // 用于强制重新渲染表单
 
   const maxLength = parseInt(process.env.NEXT_PUBLIC_MAX_TEXT_LENGTH || '200'); // 最大文本长度
+
+  // 使用 conform 处理表单
+  const [form, fields] = useForm({
+    onValidate({ formData }) {
+      return parseWithZod(formData, { schema: CreateTextSchema });
+    },
+    defaultValue: {
+      text: '',
+      userName: '',
+      expiryTime: '1day',
+      displayType: 'text',
+    }
+  });
 
   // 加载分享历史（仅用于统计显示）
   useEffect(() => {
@@ -65,16 +78,13 @@ export default function Home() {
     { value: '30days', label: '30天', hours: 24 * 30 }
   ];
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!text.trim()) {
-      alert('请输入文本内容');
-      return;
-    }
+    const formData = new FormData(e.currentTarget);
+    const submission = parseWithZod(formData, { schema: CreateTextSchema });
 
-    if (text.length > maxLength) {
-      alert(`文本长度不能超过${maxLength}个字符`);
+    if (submission.status !== 'success') {
       return;
     }
 
@@ -86,24 +96,21 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          text,
-          userName: userName.trim(),
-          expiryTime,
-          displayType
-        }),
+        body: JSON.stringify(submission.value),
       });
 
       console.log(response);
       if (!response.ok) {
-        throw new Error('提交失败');
+        const errorData = await response.json();
+        alert(errorData.error || '提交失败');
+        return;
       }
 
       const data = await response.json();
       const shareUrl = `${window.location.origin}/t/${data.id}`;
 
       let qrCode = '';
-      if (displayType === 'qrcode') {
+      if (submission.value.displayType === 'qrcode') {
         qrCode = await QRCode.toDataURL(shareUrl);
       }
 
@@ -116,10 +123,10 @@ export default function Home() {
       // 添加到分享历史
       const historyItem: ShareHistory = {
         id: data.id,
-        title: text.slice(0, 50) + (text.length > 50 ? '...' : ''),
-        userName: userName.trim(),
+        title: submission.value.text.slice(0, 50) + (submission.value.text.length > 50 ? '...' : ''),
+        userName: submission.value.userName || '',
         createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + expiryOptions.find(opt => opt.value === expiryTime)!.hours * 60 * 60 * 1000).toISOString()
+        expiresAt: new Date(Date.now() + expiryOptions.find(opt => opt.value === submission.value.expiryTime)!.hours * 60 * 60 * 1000).toISOString()
       };
       addToHistory(historyItem);
       setShareHistory(getShareHistory()); // 更新计数
@@ -144,8 +151,7 @@ export default function Home() {
   };
 
   const reset = () => {
-    setText('');
-    setUserName('');
+    setFormKey(prev => prev + 1); // 强制重新渲染表单
     setResult(null);
     setCopySuccess('');
   };
@@ -170,43 +176,48 @@ export default function Home() {
           <div className="bg-white rounded-lg shadow-xl p-4 md:p-8">
             
           {!result ? (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form key={formKey} {...getFormProps(form)} onSubmit={handleSubmit} action="#" className="space-y-6">
               <div>
                 {/* 用户名称输入 */}
                 <div>
-                  <label htmlFor="userName" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor={fields.userName.id} className="block text-sm font-medium text-gray-700 mb-2">
                     用户名称 (可选)
                   </label>
                   <input
-                    id="userName"
-                    type="text"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
+                    {...getInputProps(fields.userName, { type: 'text' })}
                     placeholder="输入名称（用于标识分享者）"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     maxLength={50}
                   />
                   <div className="text-right text-sm text-gray-500 mt-1">
-                    {userName.length}/50
+                    {(fields.userName.value || '').length}/50
                   </div>
+                  {fields.userName.errors && (
+                    <div className="text-red-600 text-sm mt-1">
+                      {fields.userName.errors}
+                    </div>
+                  )}
                 </div>
 
                 {/* 文本输入区域 */}
                 <div>
-                  <label htmlFor="text" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor={fields.text.id} className="block text-sm font-medium text-gray-700 mb-2">
                     文本内容 *
                   </label>
                   <textarea
-                    id="text"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
+                    {...getTextareaProps(fields.text)}
                     placeholder="请输入要分享的文本内容..."
                     className="w-full h-24 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                     maxLength={maxLength}
                   />
                   <div className="text-right text-sm text-gray-500 mt-1">
-                    {text.length}/{maxLength}
+                    {(fields.text.value || '').length}/{maxLength}
                   </div>
+                  {fields.text.errors && (
+                    <div className="text-red-600 text-sm mt-1">
+                      {fields.text.errors}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -220,17 +231,18 @@ export default function Home() {
                     {expiryOptions.map((option) => (
                       <label key={option.value} className="flex items-center">
                         <input
-                          type="radio"
-                          name="expiryTime"
-                          value={option.value}
-                          checked={expiryTime === option.value}
-                          onChange={(e) => setExpiryTime(e.target.value)}
+                          {...getInputProps(fields.expiryTime, { type: 'radio', value: option.value })}
                           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                         />
                         <span className="ml-2 text-sm text-gray-700">{option.label}</span>
                       </label>
                     ))}
                   </div>
+                  {fields.expiryTime.errors && (
+                    <div className="text-red-600 text-sm mt-1">
+                      {fields.expiryTime.errors}
+                    </div>
+                  )}
                 </div>
 
                 {/* 展示类型选择 */}
@@ -241,34 +253,31 @@ export default function Home() {
                   <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:gap-4">
                     <label className="flex items-center">
                       <input
-                        type="radio"
-                        name="displayType"
-                        value="text"
-                        checked={displayType === 'text'}
-                        onChange={(e) => setDisplayType(e.target.value)}
+                        {...getInputProps(fields.displayType, { type: 'radio', value: 'text' })}
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                       />
                       <span className="ml-2 text-sm text-gray-700">文本</span>
                     </label>
                     <label className="flex items-center">
                       <input
-                        type="radio"
-                        name="displayType"
-                        value="qrcode"
-                        checked={displayType === 'qrcode'}
-                        onChange={(e) => setDisplayType(e.target.value)}
+                        {...getInputProps(fields.displayType, { type: 'radio', value: 'qrcode' })}
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                       />
                       <span className="ml-2 text-sm text-gray-700">二维码</span>
                     </label>
                   </div>
+                  {fields.displayType.errors && (
+                    <div className="text-red-600 text-sm mt-1">
+                      {fields.displayType.errors}
+                    </div>
+                  )}
                 </div>
               </div>
 
                {/* 提交按钮 */}
                <button
                   type="submit"
-                  disabled={isSubmitting || !text.trim()}
+                  disabled={isSubmitting || !(fields.text.value || '').trim()}
                   className="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {isSubmitting ? '创建中...' : '创建分享链接'}

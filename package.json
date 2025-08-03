@@ -9,12 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@types/redis": "^4.0.11",
+    "@conform-to/react": "^1.8.2",
+    "@conform-to/zod": "^1.8.2",
+    "firebase": "^12.0.0",
     "next": "15.4.4",
     "qrcode": "^1.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "redis": "^5.7.0"
+    "redis": "^5.7.0",
+    "zod": "^4.0.14"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
