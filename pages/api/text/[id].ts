@@ -16,11 +16,6 @@ export default async function handler(
       return res.status(400).json({ error: '无效的ID' });
     }
 
-    // 验证ID格式（8位字符）
-    if (id.length !== 8 || !/^[A-Za-z0-9]+$/.test(id)) {
-      return res.status(400).json({ error: '无效的ID格式' });
-    }
-
     // 从Redis获取数据
     const redis = await getRedisClient();
     const textData = await redis.get(`text:${id}`);
