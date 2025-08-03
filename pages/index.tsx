@@ -295,6 +295,12 @@ export default function Home() {
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md md:rounded-l-md md:rounded-r-none bg-gray-50 text-sm md:text-base"
                   />
                   <button
+                    onClick={() => window.open(result.shareUrl, '_blank')}
+                    className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md md:rounded-none hover:bg-green-700 transition-colors whitespace-nowrap"
+                  >
+                    打开链接
+                  </button>
+                  <button
                     onClick={() => copyToClipboard(result.shareUrl, '链接')}
                     className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md md:rounded-l-none md:rounded-r-md hover:bg-blue-700 transition-colors whitespace-nowrap"
                   >
