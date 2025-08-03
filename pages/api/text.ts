@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getRedisClient, generateId, getExpirySeconds } from '../../lib/redis';
+import { getRedisClient, generateId, getExpirySeconds } from '@/lib/redis';
 
 export default async function handler(
   req: NextApiRequest,
