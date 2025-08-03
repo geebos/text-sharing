@@ -1,21 +1,19 @@
-import { useRouter } from "next/router";
+'use client';
+
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import QRCode from "qrcode";
 import { TextData } from "@/service/types";
 
 export default function TextView({ data }: { data: TextData | null }) {
   const router = useRouter();
-  const [textData, setTextData] = useState<TextData | null>(data);
   const [qrCode, setQrCode] = useState('');
   const [copySuccess, setCopySuccess] = useState('');
   const [href, setHref] = useState('');
 
   useEffect(() => {
-    if (data) {
-      setTextData(data);
-      if (data.displayType === 'qrcode') {
-        QRCode.toDataURL(data.text).then(setQrCode);
-      }
+    if (data?.displayType === 'qrcode') {
+      QRCode.toDataURL(data.text).then(setQrCode);
     }
     setHref(window.location.href);
   }, [data]);
@@ -55,10 +53,10 @@ export default function TextView({ data }: { data: TextData | null }) {
     }
   };
 
-  if (!textData) {
+  if (!data) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md mx-auto text-center">
+        <div className="max-w-md w-full mx-auto text-center">
           <div className="bg-white rounded-lg shadow-md p-8">
             <div className="text-red-500 text-6xl mb-4">⚠️</div>
             <h1 className="text-2xl font-bold text-gray-800 mb-4">出错了</h1>
@@ -82,7 +80,7 @@ export default function TextView({ data }: { data: TextData | null }) {
           {/* 头部信息 */}
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-800">
-              {textData?.userName ? `${textData.userName} 分享的文本` : '分享的文本'}
+              {data?.userName ? `${data.userName} 分享的文本` : '分享的文本'}
             </h1>
             <button
               onClick={() => router.push('/')}
@@ -93,15 +91,15 @@ export default function TextView({ data }: { data: TextData | null }) {
           </div>
 
           {/* 文本信息 */}
-          {textData && (
+          {data && (
             <>
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm text-gray-500">
-                    创建时间：{formatDate(textData.createdAt)}
+                    创建时间：{formatDate(data.createdAt)}
                   </span>
                   <span className="text-sm text-gray-500">
-                    {getTimeRemaining(textData.expiresAt)}
+                    {getTimeRemaining(data.expiresAt)}
                   </span>
                 </div>
               </div>
@@ -113,7 +111,7 @@ export default function TextView({ data }: { data: TextData | null }) {
                     文本内容
                   </label>
                   <button
-                    onClick={() => copyToClipboard(textData.text, '文本')}
+                    onClick={() => copyToClipboard(data.text, '文本')}
                     className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   >
                     复制文本
@@ -121,13 +119,13 @@ export default function TextView({ data }: { data: TextData | null }) {
                 </div>
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
                   <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800 break-words">
-                    {textData.text}
+                    {data.text}
                   </pre>
                 </div>
               </div>
 
               {/* 二维码 */}
-              {textData.displayType === 'qrcode' && qrCode && (
+              {data.displayType === 'qrcode' && qrCode && (
                 <div className="mb-6 text-center">
                   <label className="block text-sm font-medium text-gray-700 mb-3">
                     分享二维码
@@ -153,7 +151,7 @@ export default function TextView({ data }: { data: TextData | null }) {
               )}
 
               {/* 分享链接 */}
-              <div className="border-t pt-6">
+              <div className="border-t border-gray-300 pt-6">
                 <div className="flex justify-between items-center mb-3">
                   <label className="block text-sm font-medium text-gray-700">
                     分享链接

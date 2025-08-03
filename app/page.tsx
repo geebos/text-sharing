@@ -1,4 +1,7 @@
+'use client';
+
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import QRCode from 'qrcode';
 
 // 分享历史数据结构（用于统计显示）
@@ -35,6 +38,7 @@ const addToHistory = (item: ShareHistory) => {
 };
 
 export default function Home() {
+  const router = useRouter();
   const [text, setText] = useState('');
   const [userName, setUserName] = useState('');
   const [expiryTime, setExpiryTime] = useState('1day');
@@ -145,8 +149,6 @@ export default function Home() {
     setResult(null);
     setCopySuccess('');
   };
-
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -347,7 +349,7 @@ export default function Home() {
               <div className="mt-8 pt-6 border-t border-gray-200">
                 <div className="text-center">
                   <button
-                    onClick={() => window.location.href = '/history'}
+                    onClick={() => router.push('/history')}
                     className="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

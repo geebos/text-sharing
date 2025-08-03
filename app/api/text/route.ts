@@ -1,38 +1,31 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import { getRedisClient, generateId, getExpirySeconds } from '@/lib/redis';
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: '方法不允许' });
-  }
-
+export async function POST(request: NextRequest) {
   try {
-    const { text, userName, expiryTime, displayType } = req.body;
+    const { text, userName, expiryTime, displayType } = await request.json();
 
     // 验证输入
     if (!text || typeof text !== 'string') {
-      return res.status(400).json({ error: '文本内容不能为空' });
+      return NextResponse.json({ error: '文本内容不能为空' }, { status: 400 });
     }
 
     const maxLength = parseInt(process.env.NEXT_PUBLIC_MAX_TEXT_LENGTH || '200');
     if (text.length > maxLength) {
-      return res.status(400).json({ error: `文本长度不能超过${maxLength}个字符` });
+      return NextResponse.json({ error: `文本长度不能超过${maxLength}个字符` }, { status: 400 });
     }
 
     if (!expiryTime || !['1day', '7days', '30days'].includes(expiryTime)) {
-      return res.status(400).json({ error: '无效的过期时间' });
+      return NextResponse.json({ error: '无效的过期时间' }, { status: 400 });
     }
 
     if (!displayType || !['text', 'qrcode'].includes(displayType)) {
-      return res.status(400).json({ error: '无效的展示类型' });
+      return NextResponse.json({ error: '无效的展示类型' }, { status: 400 });
     }
 
     // 验证用户名称（可选）
     if (userName && (typeof userName !== 'string' || userName.length > 50)) {
-      return res.status(400).json({ error: '用户名称长度不能超过50个字符' });
+      return NextResponse.json({ error: '用户名称长度不能超过50个字符' }, { status: 400 });
     }
 
     // 生成唯一ID
@@ -60,10 +53,10 @@ export default async function handler(
       JSON.stringify(data)
     );
 
-    return res.status(200).json({ id });
+    return NextResponse.json({ id });
     
   } catch (error) {
     console.error('API错误:', error);
-    return res.status(500).json({ error: '服务器内部错误' });
+    return NextResponse.json({ error: '服务器内部错误' }, { status: 500 });
   }
 }
