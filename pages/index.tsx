@@ -96,7 +96,7 @@ export default function Home() {
       }
 
       const data = await response.json();
-      const shareUrl = `${window.location.origin}/text/${data.id}`;
+      const shareUrl = `${window.location.origin}/t/${data.id}`;
 
       let qrCode = '';
       if (displayType === 'qrcode') {

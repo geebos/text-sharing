@@ -85,7 +85,7 @@ export default function HistoryPage() {
 
   // 跳转到分享页面
   const handleViewShare = (id: string) => {
-    window.open(`/text/${id}`, '_blank');
+    window.open(`/t/${id}`, '_blank');
   };
 
   // 格式化创建时间
@@ -243,7 +243,7 @@ export default function HistoryPage() {
                           </button>
                         )}
                         <button
-                          onClick={() => navigator.clipboard.writeText(`${window.location.origin}/text/${item.id}`)}
+                          onClick={() => navigator.clipboard.writeText(`${window.location.origin}/t/${item.id}`)}
                           className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
                         >
                           复制链接
