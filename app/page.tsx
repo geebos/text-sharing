@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { useForm, getFormProps, getInputProps, getTextareaProps } from '@conform-to/react';
@@ -12,10 +12,12 @@ import TextView from '@/app/components/t/TextView';
 
 export default function Home() {
   const router = useRouter();
-  const [now, setNow] = useState<Date>(new Date());
+  const [now, setNow] = useState<Date>(new Date(2025, 1, 1, 1, 1, 1));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isProcessingQR, setIsProcessingQR] = useState(false);
 
   const [shareHistory, setShareHistory] = useState<ShareHistory[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const maxLength = parseInt(process.env.NEXT_PUBLIC_MAX_TEXT_LENGTH || '200'); // 最大文本长度
 
@@ -49,6 +51,84 @@ export default function Home() {
     return option ? option.hours : 24;
   };
 
+  // 处理二维码图片上传和识别
+  const handleQRCodeUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // 验证文件类型
+    if (!file.type.startsWith('image/')) {
+      alert('请选择图片文件');
+      return;
+    }
+
+    setIsProcessingQR(true);
+
+    try {
+      // 动态加载 jsQR 库
+      const { default: jsQR } = await import('jsqr');
+
+      // 创建图片元素
+      const img = new Image();
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        throw new Error('无法创建canvas上下文');
+      }
+
+      // 加载图片
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('图片加载失败'));
+        img.src = URL.createObjectURL(file);
+      });
+
+      // 设置canvas尺寸并绘制图片
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      // 获取图片数据
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      // 使用jsQR识别二维码
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+      if (code) {
+        // 识别成功，填充到文本框
+        // 直接操作DOM元素来设置值
+        const textArea = document.querySelector(`textarea[name="${fields.text.name}"]`) as HTMLTextAreaElement;
+        if (textArea) {
+          textArea.value = code.data;
+          // 触发change事件以确保React状态同步
+          const event = new Event('input', { bubbles: true });
+          textArea.dispatchEvent(event);
+        }
+      } else {
+        alert('未在图片中检测到二维码，请确保图片清晰且包含二维码');
+      }
+
+      // 清理资源
+      URL.revokeObjectURL(img.src);
+
+    } catch (error) {
+      console.error('二维码识别失败:', error);
+      alert('二维码识别失败，请重试');
+    } finally {
+      setIsProcessingQR(false);
+      // 清空文件输入
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  // 触发文件选择
+  const handleQRCodeReadClick = () => {
+    fileInputRef.current?.click();
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -76,7 +156,6 @@ export default function Home() {
         }),
       });
 
-      console.log(response);
       if (!response.ok) {
         const errorData = await response.json();
         alert(errorData.error || '提交失败');
@@ -209,19 +288,40 @@ export default function Home() {
                           />
                           <span className="ml-2 text-sm text-gray-700">文本</span>
                         </label>
-                        <label className="flex items-center">
-                          <input
-                            {...getInputProps(fields.displayType, { type: 'radio', value: 'qrcode' })}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                          />
-                          <span className="ml-2 text-sm text-gray-700">二维码</span>
-                        </label>
+                        <div className="flex items-center gap-2">
+                          <label className="flex items-center">
+                            <input
+                              {...getInputProps(fields.displayType, { type: 'radio', value: 'qrcode' })}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                            />
+                            <span className="ml-2 text-sm text-gray-700">二维码</span>
+                          </label>
+                          {fields.displayType.value === 'qrcode' && (
+                            <button
+                              type="button"
+                              onClick={handleQRCodeReadClick}
+                              disabled={isProcessingQR}
+                              className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+{isProcessingQR ? '处理中...' : '从二维码读取'}
+                            </button>
+                          )}
+                        </div>
                       </div>
                       {fields.displayType.errors && (
                         <div className="text-red-600 text-sm mt-1">
                           {fields.displayType.errors}
                         </div>
                       )}
+                      
+                      {/* 隐藏的文件输入 */}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleQRCodeUpload}
+                        className="hidden"
+                      />
                     </div>
                   </div>
 
