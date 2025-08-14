@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import QRCode from 'qrcode';
+
 import { useForm, getFormProps, getInputProps, getTextareaProps } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod/v4';
 import { CreateTextSchema } from '@/service/schema';
@@ -13,12 +13,7 @@ import TextView from '@/app/components/t/TextView';
 export default function Home() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [result, setResult] = useState<{
-    id: string;
-    shareUrl: string;
-    qrCode?: string;
-  } | null>(null);
-  const [copySuccess, setCopySuccess] = useState('');
+
   const [shareHistory, setShareHistory] = useState<ShareHistory[]>([]);
   const [formKey, setFormKey] = useState(0); // 用于强制重新渲染表单
 
@@ -88,18 +83,6 @@ export default function Home() {
       }
 
       const data = await response.json();
-      const shareUrl = `${window.location.origin}/t/${data.id}`;
-
-      let qrCode = '';
-      if (submission.value.displayType === 'qrcode') {
-        qrCode = await QRCode.toDataURL(shareUrl);
-      }
-
-      setResult({
-        id: data.id,
-        shareUrl,
-        qrCode
-      });
 
       // 添加到分享历史
       const historyItem: ShareHistory = {
@@ -111,7 +94,9 @@ export default function Home() {
         deleteToken: deleteToken
       };
       addHistory(historyItem);
-      setShareHistory(getHistory()); // 更新计数
+
+      // 跳转到成功页面
+      router.push(`/result?id=${data.id}&displayType=${submission.value.displayType}`);
 
     } catch (error) {
       console.error('提交失败:', error);
@@ -119,23 +104,6 @@ export default function Home() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const copyToClipboard = async (content: string, type: string) => {
-    try {
-      await navigator.clipboard.writeText(content);
-      setCopySuccess(`${type}已复制到剪贴板`);
-      setTimeout(() => setCopySuccess(''), 2000);
-    } catch (err) {
-      console.error('复制失败:', err);
-      setCopySuccess('复制失败');
-    }
-  };
-
-  const reset = () => {
-    setFormKey(prev => prev + 1); // 强制重新渲染表单
-    setResult(null);
-    setCopySuccess('');
   };
 
   return (
@@ -155,8 +123,7 @@ export default function Home() {
       {/* Main Content */}
       <div className="px-4 pb-8">
         <div className="max-w-6xl mx-auto">
-          {!result ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Form Section */}
               <div className="bg-white rounded-lg shadow-sm p-4 md:p-8">
                 <form key={formKey} {...getFormProps(form)} onSubmit={handleSubmit} action="#" className="space-y-6">
@@ -298,82 +265,10 @@ export default function Home() {
                   createdAt: new Date().toISOString(),
                   expiresAt: new Date(Date.now() + getExpiryHours(fields.expiryTime.value || '1day') * 60 * 60 * 1000).toISOString()
                 } as TextData}
+                href={'https://example.com/t/preview-example'}
                 isPreview={true}
               />
-            </div>
-          ) : (
-            /* 结果展示区域 - 保持原有的居中布局 */
-            <div className="max-w-2xl mx-auto">
-              <div className="bg-white rounded-lg shadow-sm p-4 md:p-8">
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                      分享链接创建成功！
-                    </h2>
-                    <p className="text-gray-600">您的内容已安全分享，可以通过以下方式访问</p>
-                  </div>
-
-                  {/* 分享链接 */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      分享链接
-                    </label>
-                    <div className="flex flex-col space-y-2 md:flex-row md:space-y-0">
-                      <input
-                        type="text"
-                        value={result.shareUrl}
-                        readOnly
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md md:rounded-l-md md:rounded-r-none bg-gray-50 text-sm md:text-base"
-                      />
-                      <button
-                        onClick={() => window.open(result.shareUrl, '_blank')}
-                        className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md md:rounded-none hover:bg-green-700 transition-colors whitespace-nowrap"
-                      >
-                        打开链接
-                      </button>
-                      <button
-                        onClick={() => copyToClipboard(result.shareUrl, '链接')}
-                        className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md md:rounded-l-none md:rounded-r-md hover:bg-blue-700 transition-colors whitespace-nowrap"
-                      >
-                        复制链接
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 二维码 */}
-                  {result.qrCode && (
-                    <div className="text-center">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        分享二维码
-                      </label>
-                      <div className="inline-block p-4 bg-white border border-gray-300 rounded-md">
-                        <img
-                          src={result.qrCode}
-                          alt="分享二维码"
-                          className="w-32 h-32 md:w-48 md:h-48"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* 成功提示 */}
-                  {copySuccess && (
-                    <div className="text-center text-green-600 text-sm">
-                      {copySuccess}
-                    </div>
-                  )}
-
-                  {/* 重新创建按钮 */}
-                  <button
-                    onClick={reset}
-                    className="w-full py-3 px-4 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 transition-colors"
-                  >
-                    创建新的分享
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TextData } from "@/service/types";
 import TextView from "@/app/components/t/TextView";
@@ -10,6 +11,11 @@ interface TextViewPageProps {
 
 export default function TextViewPage({ data }: TextViewPageProps) {
   const router = useRouter();
+  const [href, setHref] = useState('');
+
+  useEffect(() => {
+    setHref(window.location.href);
+  }, []);
 
   const handleCreateNew = () => {
     router.push('/');
@@ -38,7 +44,7 @@ export default function TextViewPage({ data }: TextViewPageProps) {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <TextView data={data} onCreateNew={handleCreateNew} />
+        <TextView data={data} href={href} onCreateNew={handleCreateNew} />
       </div>
     </div>
   );
