@@ -12,6 +12,7 @@ import TextView from '@/app/components/t/TextView';
 
 export default function Home() {
   const router = useRouter();
+  const [now, setNow] = useState<Date>(new Date());
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [shareHistory, setShareHistory] = useState<ShareHistory[]>([]);
@@ -34,6 +35,7 @@ export default function Home() {
   // 加载分享历史（仅用于统计显示）
   useEffect(() => {
     setShareHistory(getHistory());
+    setNow(new Date());
   }, []);
 
   const expiryOptions = [
@@ -262,7 +264,7 @@ export default function Home() {
                   userName: fields.userName.value,
                   displayType: fields.displayType.value as 'text' | 'qrcode' || 'text',
                   createdAt: new Date().toISOString(),
-                  expiresAt: new Date(Date.now() + getExpiryHours(fields.expiryTime.value || '1day') * 60 * 60 * 1000).toISOString()
+                  expiresAt: new Date(now.getTime() + getExpiryHours(fields.expiryTime.value || '1day') * 60 * 60 * 1000).toISOString()
                 } as TextData}
                 href={'https://example.com/t/preview-example'}
                 isPreview={true}
