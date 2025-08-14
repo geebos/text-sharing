@@ -6,8 +6,9 @@ import QRCode from 'qrcode';
 import { useForm, getFormProps, getInputProps, getTextareaProps } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod/v4';
 import { CreateTextSchema } from '@/service/schema';
-import { ShareHistory } from '@/service/types';
+import { ShareHistory, TextData } from '@/service/types';
 import { getHistory, addHistory, generateDeleteToken } from '@/service/history';
+import TextView from '@/app/components/t/TextView';
 
 export default function Home() {
   const router = useRouter();
@@ -46,6 +47,11 @@ export default function Home() {
     { value: '7days', label: '7天', hours: 24 * 7 },
     { value: '30days', label: '30天', hours: 24 * 30 }
   ];
+
+  const getExpiryHours = (expiryTime: string) => {
+    const option = expiryOptions.find(opt => opt.value === expiryTime);
+    return option ? option.hours : 24;
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -148,209 +154,226 @@ export default function Home() {
 
       {/* Main Content */}
       <div className="px-4 pb-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow-xl p-4 md:p-8">
-            
+        <div className="max-w-6xl mx-auto">
           {!result ? (
-            <form key={formKey} {...getFormProps(form)} onSubmit={handleSubmit} action="#" className="space-y-6">
-              <div>
-                {/* 用户名称输入 */}
-                <div>
-                  <label htmlFor={fields.userName.id} className="block text-sm font-medium text-gray-700 mb-2">
-                    用户名称 (可选)
-                  </label>
-                  <input
-                    {...getInputProps(fields.userName, { type: 'text' })}
-                    placeholder="输入名称（用于标识分享者）"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    maxLength={50}
-                  />
-                  <div className="text-right text-sm text-gray-500 mt-1">
-                    {(fields.userName.value || '').length}/50
-                  </div>
-                  {fields.userName.errors && (
-                    <div className="text-red-600 text-sm mt-1">
-                      {fields.userName.errors}
-                    </div>
-                  )}
-                </div>
-
-                {/* 文本输入区域 */}
-                <div>
-                  <label htmlFor={fields.text.id} className="block text-sm font-medium text-gray-700 mb-2">
-                    文本内容 *
-                  </label>
-                  <textarea
-                    {...getTextareaProps(fields.text)}
-                    placeholder="请输入要分享的文本内容..."
-                    className="w-full h-24 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                    maxLength={maxLength}
-                  />
-                  <div className="text-right text-sm text-gray-500 mt-1">
-                    {(fields.text.value || '').length}/{maxLength}
-                  </div>
-                  {fields.text.errors && (
-                    <div className="text-red-600 text-sm mt-1">
-                      {fields.text.errors}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex flex-col space-y-6 md:flex-row md:space-y-0 md:space-x-8">
-                {/* 过期时间选择 */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    过期时间 *
-                  </label>
-                  <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:gap-4">
-                    {expiryOptions.map((option) => (
-                      <label key={option.value} className="flex items-center">
-                        <input
-                          {...getInputProps(fields.expiryTime, { type: 'radio', value: option.value })}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Form Section */}
+              <div className="bg-white rounded-lg shadow-sm p-4 md:p-8">
+                <form key={formKey} {...getFormProps(form)} onSubmit={handleSubmit} action="#" className="space-y-6">
+                  <div>
+                    {/* 用户名称输入 */}
+                    <div>
+                      <label htmlFor={fields.userName.id} className="block text-sm font-medium text-gray-700 mb-2">
+                        用户名称 (可选)
                       </label>
-                    ))}
-                  </div>
-                  {fields.expiryTime.errors && (
-                    <div className="text-red-600 text-sm mt-1">
-                      {fields.expiryTime.errors}
-                    </div>
-                  )}
-                </div>
-
-                {/* 展示类型选择 */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    分享类型
-                  </label>
-                  <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:gap-4">
-                    <label className="flex items-center">
                       <input
-                        {...getInputProps(fields.displayType, { type: 'radio', value: 'text' })}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        {...getInputProps(fields.userName, { type: 'text' })}
+                        placeholder="输入名称（用于标识分享者）"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        maxLength={50}
                       />
-                      <span className="ml-2 text-sm text-gray-700">文本</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input
-                        {...getInputProps(fields.displayType, { type: 'radio', value: 'qrcode' })}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">二维码</span>
-                    </label>
-                  </div>
-                  {fields.displayType.errors && (
-                    <div className="text-red-600 text-sm mt-1">
-                      {fields.displayType.errors}
+                      <div className="text-right text-sm text-gray-500 mt-1">
+                        {(fields.userName.value || '').length}/50
+                      </div>
+                      {fields.userName.errors && (
+                        <div className="text-red-600 text-sm mt-1">
+                          {fields.userName.errors}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
 
-               {/* 提交按钮 */}
-               <button
-                  type="submit"
-                  disabled={isSubmitting || !(fields.text.value || '').trim()}
-                  className="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  {isSubmitting ? '创建中...' : '创建分享链接'}
-                </button>
-            </form>
-            ) : (
-            /* 结果展示区域 */
-            <div className="space-y-6">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  分享链接创建成功！
-                </h2>
-                <p className="text-gray-600">您的内容已安全分享，可以通过以下方式访问</p>
-              </div>
+                    {/* 文本输入区域 */}
+                    <div>
+                      <label htmlFor={fields.text.id} className="block text-sm font-medium text-gray-700 mb-2">
+                        文本内容 *
+                      </label>
+                      <textarea
+                        {...getTextareaProps(fields.text)}
+                        placeholder="请输入要分享的文本内容..."
+                        className="w-full h-24 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                        maxLength={maxLength}
+                      />
+                      <div className="text-right text-sm text-gray-500 mt-1">
+                        {(fields.text.value || '').length}/{maxLength}
+                      </div>
+                      {fields.text.errors && (
+                        <div className="text-red-600 text-sm mt-1">
+                          {fields.text.errors}
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-              {/* 分享链接 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  分享链接
-                </label>
-                <div className="flex flex-col space-y-2 md:flex-row md:space-y-0">
-                  <input
-                    type="text"
-                    value={result.shareUrl}
-                    readOnly
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md md:rounded-l-md md:rounded-r-none bg-gray-50 text-sm md:text-base"
-                  />
+                  <div className="flex flex-col space-y-6 md:flex-row md:space-y-0 md:space-x-8">
+                    {/* 过期时间选择 */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        过期时间 *
+                      </label>
+                      <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:gap-4">
+                        {expiryOptions.map((option) => (
+                          <label key={option.value} className="flex items-center">
+                            <input
+                              {...getInputProps(fields.expiryTime, { type: 'radio', value: option.value })}
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                            />
+                            <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                      {fields.expiryTime.errors && (
+                        <div className="text-red-600 text-sm mt-1">
+                          {fields.expiryTime.errors}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 展示类型选择 */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        分享类型
+                      </label>
+                      <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:gap-4">
+                        <label className="flex items-center">
+                          <input
+                            {...getInputProps(fields.displayType, { type: 'radio', value: 'text' })}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          />
+                          <span className="ml-2 text-sm text-gray-700">文本</span>
+                        </label>
+                        <label className="flex items-center">
+                          <input
+                            {...getInputProps(fields.displayType, { type: 'radio', value: 'qrcode' })}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          />
+                          <span className="ml-2 text-sm text-gray-700">二维码</span>
+                        </label>
+                      </div>
+                      {fields.displayType.errors && (
+                        <div className="text-red-600 text-sm mt-1">
+                          {fields.displayType.errors}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* 提交按钮 */}
                   <button
-                    onClick={() => window.open(result.shareUrl, '_blank')}
-                    className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md md:rounded-none hover:bg-green-700 transition-colors whitespace-nowrap"
+                    type="submit"
+                    disabled={isSubmitting || !(fields.text.value || '').trim()}
+                    className="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    打开链接
+                    {isSubmitting ? '创建中...' : '创建分享链接'}
                   </button>
-                  <button
-                    onClick={() => copyToClipboard(result.shareUrl, '链接')}
-                    className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md md:rounded-l-none md:rounded-r-md hover:bg-blue-700 transition-colors whitespace-nowrap"
-                  >
-                    复制链接
-                  </button>
-                </div>
-              </div>
+                </form>
 
-              {/* 二维码 */}
-              {result.qrCode && (
-                <div className="text-center">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    分享二维码
-                  </label>
-                  <div className="inline-block p-4 bg-white border border-gray-300 rounded-md">
-                    <img
-                      src={result.qrCode}
-                      alt="分享二维码"
-                      className="w-32 h-32 md:w-48 md:h-48"
-                    />
+                {/* 历史记录入口 */}
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <div className="text-center">
+                    <button
+                      onClick={() => router.push('/history')}
+                      className="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      查看分享历史
+                      {shareHistory.length > 0 && (
+                        <span className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded-full">
+                          {shareHistory.length}
+                        </span>
+                      )}
+                    </button>
                   </div>
                 </div>
-              )}
+              </div>
 
-              {/* 成功提示 */}
-              {copySuccess && (
-                <div className="text-center text-green-600 text-sm">
-                  {copySuccess}
-                </div>
-              )}
-
-              {/* 重新创建按钮 */}
-              <button
-                onClick={reset}
-                className="w-full py-3 px-4 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 transition-colors"
-              >
-                创建新的分享
-              </button>
+              {/* Preview Section */}
+              <TextView
+                data={{
+                  id: 'preview',
+                  text: fields.text.value || '请输入文本内容...',
+                  userName: fields.userName.value,
+                  displayType: fields.displayType.value as 'text' | 'qrcode' || 'text',
+                  createdAt: new Date().toISOString(),
+                  expiresAt: new Date(Date.now() + getExpiryHours(fields.expiryTime.value || '1day') * 60 * 60 * 1000).toISOString()
+                } as TextData}
+                isPreview={true}
+              />
             </div>
-            )}
-            
-            {/* 历史记录入口 */}
-            {!result && (
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <div className="text-center">
+          ) : (
+            /* 结果展示区域 - 保持原有的居中布局 */
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-white rounded-lg shadow-sm p-4 md:p-8">
+                <div className="space-y-6">
+                  <div className="text-center mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                      分享链接创建成功！
+                    </h2>
+                    <p className="text-gray-600">您的内容已安全分享，可以通过以下方式访问</p>
+                  </div>
+
+                  {/* 分享链接 */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      分享链接
+                    </label>
+                    <div className="flex flex-col space-y-2 md:flex-row md:space-y-0">
+                      <input
+                        type="text"
+                        value={result.shareUrl}
+                        readOnly
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md md:rounded-l-md md:rounded-r-none bg-gray-50 text-sm md:text-base"
+                      />
+                      <button
+                        onClick={() => window.open(result.shareUrl, '_blank')}
+                        className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md md:rounded-none hover:bg-green-700 transition-colors whitespace-nowrap"
+                      >
+                        打开链接
+                      </button>
+                      <button
+                        onClick={() => copyToClipboard(result.shareUrl, '链接')}
+                        className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md md:rounded-l-none md:rounded-r-md hover:bg-blue-700 transition-colors whitespace-nowrap"
+                      >
+                        复制链接
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 二维码 */}
+                  {result.qrCode && (
+                    <div className="text-center">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        分享二维码
+                      </label>
+                      <div className="inline-block p-4 bg-white border border-gray-300 rounded-md">
+                        <img
+                          src={result.qrCode}
+                          alt="分享二维码"
+                          className="w-32 h-32 md:w-48 md:h-48"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 成功提示 */}
+                  {copySuccess && (
+                    <div className="text-center text-green-600 text-sm">
+                      {copySuccess}
+                    </div>
+                  )}
+
+                  {/* 重新创建按钮 */}
                   <button
-                    onClick={() => router.push('/history')}
-                    className="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    onClick={reset}
+                    className="w-full py-3 px-4 bg-gray-600 text-white font-medium rounded-md hover:bg-gray-700 transition-colors"
                   >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    查看分享历史
-                    {shareHistory.length > 0 && (
-                      <span className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded-full">
-                        {shareHistory.length}
-                      </span>
-                    )}
+                    创建新的分享
                   </button>
                 </div>
               </div>
+            </div>
           )}
-          </div>
         </div>
       </div>
 
@@ -358,7 +381,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto text-center">
           {/* Features Grid */}
           <div className="grid md:grid-cols-3 gap-8 mb-16">
-            <div className="bg-white rounded-lg p-6 shadow-lg">
+            <div className="bg-white rounded-lg p-6 shadow-sm">
               <div className="text-blue-600 mb-4">
                 <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -369,8 +392,8 @@ export default function Home() {
                 防搜索引擎索引、设置有效期限、随机 URL 生成，确保您的内容安全私密
               </p>
             </div>
-            
-            <div className="bg-white rounded-lg p-6 shadow-lg">
+
+            <div className="bg-white rounded-lg p-6 shadow-sm">
               <div className="text-green-600 mb-4">
                 <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -381,8 +404,8 @@ export default function Home() {
                 自动保存分享历史，方便管理和查看之前的分享内容
               </p>
             </div>
-            
-            <div className="bg-white rounded-lg p-6 shadow-lg">
+
+            <div className="bg-white rounded-lg p-6 shadow-sm">
               <div className="text-purple-600 mb-4">
                 <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />

@@ -1,22 +1,38 @@
 'use client';
 
-import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import QRCode from "qrcode";
 import { TextData } from "@/service/types";
 
-export default function TextView({ data }: { data: TextData | null }) {
-  const router = useRouter();
+interface TextViewProps {
+  data: TextData;
+  isPreview?: boolean;
+  onCreateNew?: () => void;
+}
+
+export default function TextView({ data, isPreview = false, onCreateNew }: TextViewProps) {
   const [qrCode, setQrCode] = useState('');
   const [copySuccess, setCopySuccess] = useState('');
   const [href, setHref] = useState('');
 
   useEffect(() => {
     if (data?.displayType === 'qrcode') {
-      QRCode.toDataURL(data.text).then(setQrCode);
+      if (isPreview) {
+        // 预览模式：生成预览用的二维码
+        if (typeof window !== 'undefined' && data.text !== '请输入文本内容...') {
+          const previewUrl = `${window.location.origin}/t/preview-${Date.now()}`;
+          QRCode.toDataURL(previewUrl).then(setQrCode);
+        }
+      } else {
+        // 正常模式：使用实际文本内容生成二维码
+        QRCode.toDataURL(data.text).then(setQrCode);
+      }
     }
-    setHref(window.location.href);
-  }, [data]);
+    
+    if (typeof window !== 'undefined' && !isPreview) {
+      setHref(window.location.href);
+    }
+  }, [data, isPreview]);
 
   const copyToClipboard = async (content: string, type: string) => {
     try {
@@ -53,41 +69,29 @@ export default function TextView({ data }: { data: TextData | null }) {
     }
   };
 
-  if (!data) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full mx-auto text-center">
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <div className="text-red-500 text-6xl mb-4">⚠️</div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">出错了</h1>
-            <p className="text-gray-600 mb-6">文本不存在或已过期</p>
-            <button
-              onClick={() => router.push('/')}
-              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
-            >
-              返回首页
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const isEmptyText = !data.text || data.text === '请输入文本内容...';
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-6">
+    <div className={`bg-white rounded-lg shadow-sm p-${isPreview ? '4' : '6'}`}>
           {/* 头部信息 */}
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">
+            <h1 className={`${isPreview ? 'text-xl' : 'text-2xl'} font-bold text-gray-800`}>
               {data?.userName ? `${data.userName} 分享的文本` : '分享的文本'}
             </h1>
-            <button
-              onClick={() => router.push('/')}
-              className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-            >
-              创建新分享
-            </button>
+            {isPreview ? (
+              <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                预览模式
+              </span>
+            ) : (
+              onCreateNew && (
+                <button
+                  onClick={onCreateNew}
+                  className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                >
+                  创建新分享
+                </button>
+              )
+            )}
           </div>
 
           {/* 文本信息 */}
@@ -112,31 +116,48 @@ export default function TextView({ data }: { data: TextData | null }) {
                   </label>
                   <button
                     onClick={() => copyToClipboard(data.text, '文本')}
-                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    disabled={isEmptyText}
+                    className={`px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isPreview ? 'text-xs px-2' : ''}`}
                   >
                     复制文本
                   </button>
                 </div>
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
-                  <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800 break-words">
-                    {data.text}
+                  <pre className={`whitespace-pre-wrap font-mono text-sm text-gray-800 break-words ${isPreview ? 'min-h-[60px]' : ''}`}>
+                    {isEmptyText ? (
+                      <span className="text-gray-400 italic">请输入文本内容...</span>
+                    ) : (
+                      data.text
+                    )}
                   </pre>
                 </div>
               </div>
 
               {/* 二维码 */}
-              {data.displayType === 'qrcode' && qrCode && (
+              {data.displayType === 'qrcode' && (
                 <div className="mb-6 text-center">
                   <label className="block text-sm font-medium text-gray-700 mb-3">
                     分享二维码
                   </label>
-                  <div className="inline-block p-1 bg-white border border-gray-300 rounded-md">
-                    <img
-                      src={qrCode}
-                      alt="分享二维码"
-                      className="w-48 h-48"
-                    />
-                  </div>
+                  {qrCode ? (
+                    <div className="inline-block p-1 bg-white border border-gray-300 rounded-md">
+                      <img
+                        src={qrCode}
+                        alt="分享二维码"
+                        className={`${isPreview ? 'w-32 h-32' : 'w-48 h-48'}`}
+                      />
+                    </div>
+                  ) : (
+                    isPreview && (
+                      <div className="inline-block p-1 bg-white border border-gray-300 rounded-md">
+                        <div className="w-32 h-32 bg-gray-100 flex items-center justify-center">
+                          <span className="text-gray-400 text-xs text-center">
+                            {isEmptyText ? '输入内容后显示二维码' : '生成中...'}
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  )}
                   <p className="text-sm text-gray-500 mt-2">
                     扫描二维码获取文本内容
                   </p>
@@ -154,26 +175,35 @@ export default function TextView({ data }: { data: TextData | null }) {
               <div className="border-t border-gray-300 pt-6">
                 <div className="flex justify-between items-center mb-3">
                   <label className="block text-sm font-medium text-gray-700">
-                    分享链接
+                    {isPreview ? '分享链接（预览）' : '分享链接'}
                   </label>
                   <button
-                    onClick={() => copyToClipboard(window.location.href, '链接')}
-                    className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                    onClick={() => copyToClipboard(
+                      isPreview 
+                        ? (typeof window !== 'undefined' 
+                            ? `${window.location.origin}/t/preview-example`
+                            : '/t/preview-example')
+                        : href, 
+                      '链接'
+                    )}
+                    className={`px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors ${isPreview ? 'text-xs px-2' : ''}`}
                   >
                     复制链接
                   </button>
                 </div>
                 <div className="bg-gray-50 border border-gray-300 rounded-md p-3">
-                  <code className="text-sm text-gray-800 break-all">
-                    {href}
+                  <code className={`text-sm text-gray-800 break-all ${isPreview ? 'text-xs text-gray-600' : ''}`}>
+                    {isPreview 
+                      ? (typeof window !== 'undefined' 
+                          ? `${window.location.origin}/t/preview-example`
+                          : '/t/preview-example')
+                      : href
+                    }
                   </code>
                 </div>
               </div>
             </>
           )}
-        </div>
-      </div>
     </div>
   );
-
 }

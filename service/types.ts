@@ -1,6 +1,7 @@
 export interface TextData {
+  id: string;
   text: string;
-  userName: string;
+  userName?: string;
   displayType: 'text' | 'qrcode';
   createdAt: string;
   expiresAt: string;
