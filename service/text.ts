@@ -10,6 +10,7 @@ export const getText = async (id: string) => {
   }
 
   const data = JSON.parse(textData);
+  data && data.deleteToken ? delete data.deleteToken : null;
 
   // 检查是否已过期（双重检查）
   const expiresAt = new Date(data.expiresAt);
