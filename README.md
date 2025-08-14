@@ -83,7 +83,7 @@ pnpm run dev
 
 ## API接口
 
-### POST /api/text
+### POST /api/share
 
 创建文本分享
 
@@ -103,7 +103,7 @@ pnpm run dev
 }
 ```
 
-### GET /api/text/[id]
+### GET /api/share/[id]
 
 获取文本内容
 
@@ -125,8 +125,8 @@ text-sharing/
 │   ├── index.tsx           # 首页（文本提交）
 │   ├── text/[id].tsx       # 文本查看页面
 │   └── api/                # API接口
-│       ├── text.ts         # 文本提交接口
-│       └── text/[id].ts    # 文本获取接口
+│       ├── share.ts        # 文本提交接口
+│       └── share/[id].ts   # 文本获取接口
 ├── lib/                    # 公共库
 │   └── redis.ts           # Redis连接和工具函数
 ├── styles/                 # 样式文件

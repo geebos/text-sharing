@@ -60,7 +60,7 @@ export default function Home() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/text', {
+      const response = await fetch('/api/share', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
