@@ -15,7 +15,6 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [shareHistory, setShareHistory] = useState<ShareHistory[]>([]);
-  const [formKey, setFormKey] = useState(0); // 用于强制重新渲染表单
 
   const maxLength = parseInt(process.env.NEXT_PUBLIC_MAX_TEXT_LENGTH || '200'); // 最大文本长度
 
@@ -126,7 +125,7 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Form Section */}
               <div className="bg-white rounded-lg shadow-sm p-4 md:p-8">
-                <form key={formKey} {...getFormProps(form)} onSubmit={handleSubmit} action="#" className="space-y-6">
+                <form {...getFormProps(form)} onSubmit={handleSubmit} action="#" className="space-y-6">
                   <div>
                     {/* 用户名称输入 */}
                     <div>

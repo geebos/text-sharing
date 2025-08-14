@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { TextData } from "@/service/types";
 import QRCodeDisplay from "@/app/components/QRCodeDisplay";
+import CanvasText from "@/app/components/CanvasText";
 
 interface TextViewProps {
   data: TextData;
@@ -55,9 +56,27 @@ export default function TextView({ data, href, isPreview = false, onCreateNew }:
     <div className={`bg-white rounded-lg shadow-sm p-${isPreview ? '4' : '6'}`}>
       {/* 头部信息 */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className={`${isPreview ? 'text-xl' : 'text-2xl'} font-bold text-gray-800`}>
-          {data?.userName ? `${data.userName} 分享的文本` : '分享的文本'}
-        </h1>
+        <div className={`${isPreview ? 'text-xl' : 'text-2xl'} font-bold text-gray-800`}>
+          {data?.userName ? (
+            <CanvasText 
+              text={`${data.userName} 分享的文本`}
+              fontSize={isPreview ? 20 : 24}
+              fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif"
+              color="#1f2937"
+              fontWeight="bold"
+              className="inline-block"
+            />
+          ) : (
+            <CanvasText 
+              text="分享的文本"
+              fontSize={isPreview ? 20 : 24}
+              fontFamily="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif"
+              color="#1f2937"
+              fontWeight="bold"
+              className="inline-block"
+            />
+          )}
+        </div>
         {isPreview ? (
           <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
             预览模式
@@ -103,13 +122,19 @@ export default function TextView({ data, href, isPreview = false, onCreateNew }:
               </button>
             </div>
             <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
-              <pre className={`whitespace-pre-wrap font-mono text-sm text-gray-800 break-words ${isPreview ? 'min-h-[60px]' : ''}`}>
+              <div className={`${isPreview ? 'min-h-[60px]' : ''} flex items-start`}>
                 {isEmptyText ? (
-                  <span className="text-gray-400 italic">请输入文本内容...</span>
+                  <span className="text-gray-400 italic text-sm">请输入文本内容...</span>
                 ) : (
-                  data.text
+                  <CanvasText 
+                    text={data.text}
+                    fontSize={14}
+                    fontFamily="ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"
+                    color="#1f2937"
+                    lineHeight={1.5}
+                  />
                 )}
-              </pre>
+              </div>
             </div>
           </div>
 

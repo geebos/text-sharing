@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import QRCodeDisplay from '@/app/components/QRCodeDisplay';
 
@@ -10,7 +10,7 @@ interface ShareResult {
   displayType: 'text' | 'qrcode';
 }
 
-export default function ResultPage() {
+function ResultPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [result, setResult] = useState<ShareResult | null>(null);
@@ -211,5 +211,24 @@ export default function ResultPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">加载中...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function ResultPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <ResultPageContent />
+    </Suspense>
   );
 }
