@@ -6,39 +6,8 @@ import QRCode from 'qrcode';
 import { useForm, getFormProps, getInputProps, getTextareaProps } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod/v4';
 import { CreateTextSchema } from '@/service/schema';
-
-// 分享历史数据结构（用于统计显示）
-interface ShareHistory {
-  id: string
-  title: string
-  userName: string
-  createdAt: string
-  expiresAt: string
-}
-
-// 分享历史管理函数
-const STORAGE_KEY = 'text-sharing-history';
-
-const getShareHistory = (): ShareHistory[] => {
-  if (typeof window === 'undefined') return [];
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-};
-
-const addToHistory = (item: ShareHistory) => {
-  if (typeof window === 'undefined') return;
-  try {
-    const history = getShareHistory();
-    const newHistory = [item, ...history.filter(h => h.id !== item.id)].slice(0, 10); // 最多保存10条
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newHistory));
-  } catch (error) {
-    console.error('保存分享历史失败:', error);
-  }
-};
+import { ShareHistory } from '@/service/types';
+import { getHistory, addHistory } from '@/service/history';
 
 export default function Home() {
   const router = useRouter();
@@ -69,7 +38,7 @@ export default function Home() {
 
   // 加载分享历史（仅用于统计显示）
   useEffect(() => {
-    setShareHistory(getShareHistory());
+    setShareHistory(getHistory());
   }, []);
 
   const expiryOptions = [
@@ -128,8 +97,8 @@ export default function Home() {
         createdAt: new Date().toISOString(),
         expiresAt: new Date(Date.now() + expiryOptions.find(opt => opt.value === submission.value.expiryTime)!.hours * 60 * 60 * 1000).toISOString()
       };
-      addToHistory(historyItem);
-      setShareHistory(getShareHistory()); // 更新计数
+      addHistory(historyItem);
+      setShareHistory(getHistory()); // 更新计数
 
     } catch (error) {
       console.error('提交失败:', error);

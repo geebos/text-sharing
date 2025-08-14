@@ -2,37 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-
-// 分享历史数据结构
-interface ShareHistory {
-  id: string;
-  title: string;
-  userName: string;
-  createdAt: string;
-  expiresAt: string;
-}
-
-// 分享历史管理函数
-const STORAGE_KEY = 'text-sharing-history';
-
-const getShareHistory = (): ShareHistory[] => {
-  if (typeof window === 'undefined') return [];
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-};
-
-const clearHistory = () => {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch (error) {
-    console.error('清空分享历史失败:', error);
-  }
-};
+import { ShareHistory } from '@/service/types';
+import { getHistory, cleanExpiredHistory } from '@/service/history';
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -40,14 +11,14 @@ export default function HistoryPage() {
 
   // 加载分享历史
   useEffect(() => {
-    setShareHistory(getShareHistory());
+    setShareHistory(getHistory());
   }, []);
 
   // 定时更新过期时间显示
   useEffect(() => {
     const interval = setInterval(() => {
       if (shareHistory.length > 0) {
-        setShareHistory(getShareHistory());
+        setShareHistory(getHistory());
       }
     }, 60000); // 每分钟更新一次
 
@@ -77,11 +48,16 @@ export default function HistoryPage() {
     }
   };
 
-  // 清空所有历史记录
-  const handleClearHistory = () => {
-    if (window.confirm('确定要清空所有分享历史吗？')) {
-      clearHistory();
-      setShareHistory([]);
+  // 清空过期历史记录
+  const handleClearExpiredHistory = () => {
+    const expiredCount = shareHistory.filter(item => new Date(item.expiresAt) <= new Date()).length;
+    if (expiredCount === 0) {
+      alert('没有过期的记录需要清理');
+      return;
+    }
+    if (window.confirm(`确定要清空 ${expiredCount} 条过期的分享历史吗？`)) {
+      cleanExpiredHistory();
+      setShareHistory(getHistory());
     }
   };
 
@@ -152,12 +128,12 @@ export default function HistoryPage() {
         <div className="bg-white rounded-lg shadow-sm">
           <div className="flex justify-between items-center p-6 border-b border-gray-100">
             <h2 className="text-xl font-semibold text-gray-800">历史记录</h2>
-            {shareHistory.length > 0 && (
+            {shareHistory.filter(item => new Date(item.expiresAt) <= new Date()).length > 0 && (
               <button
-                onClick={handleClearHistory}
+                onClick={handleClearExpiredHistory}
                 className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
               >
-                清空所有记录
+                清空过期记录
               </button>
             )}
           </div>

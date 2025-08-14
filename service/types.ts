@@ -5,3 +5,11 @@ export interface TextData {
   createdAt: string;
   expiresAt: string;
 }
+
+export interface ShareHistory {
+  id: string;
+  title: string;
+  userName: string;
+  createdAt: string;
+  expiresAt: string;
+}
