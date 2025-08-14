@@ -3,6 +3,19 @@ import { ShareHistory } from './types';
 const STORAGE_KEY = 'text-sharing-history';
 
 /**
+ * 生成8位字母数字组合的删除token
+ * @returns string 8位删除token
+ */
+export const generateDeleteToken = (): string => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
+/**
  * 获取分享历史记录
  * @returns ShareHistory[] 分享历史记录数组
  */

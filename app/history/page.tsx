@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShareHistory } from '@/service/types';
-import { getHistory, cleanExpiredHistory } from '@/service/history';
+import { getHistory, cleanExpiredHistory, deleteHistory } from '@/service/history';
 
 export default function HistoryPage() {
   const router = useRouter();
   const [shareHistory, setShareHistory] = useState<ShareHistory[]>([]);
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
 
   // 加载分享历史
   useEffect(() => {
@@ -70,6 +71,55 @@ export default function HistoryPage() {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleString('zh-CN');
+  };
+
+  // 删除分享
+  const handleDeleteShare = async (item: ShareHistory) => {
+    // 检查是否有删除权限（是否有 deleteToken）
+    if (!item.deleteToken) {
+      alert('此分享记录创建时没有删除权限，无法删除。只能删除新创建的分享记录。');
+      return;
+    }
+
+    if (!window.confirm(`确定要删除分享"${item.title}"吗？删除后将无法恢复。`)) {
+      return;
+    }
+
+    setDeletingIds(prev => new Set(prev).add(item.id));
+
+    try {
+      const response = await fetch('/api/share', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: item.id,
+          deleteToken: item.deleteToken
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        alert(errorData.error || '删除失败');
+        return;
+      }
+
+      // 从本地存储中删除
+      deleteHistory(item.id);
+      setShareHistory(getHistory());
+      alert('删除成功');
+
+    } catch (error) {
+      console.error('删除失败:', error);
+      alert('删除失败，请重试');
+    } finally {
+      setDeletingIds(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(item.id);
+        return newSet;
+      });
+    }
   };
 
   return (
@@ -213,12 +263,23 @@ export default function HistoryPage() {
 
                       <div className="flex items-center gap-3">
                         {!isExpired && (
-                          <button
-                            onClick={() => handleViewShare(item.id)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                          >
-                            查看分享
-                          </button>
+                          <>
+                            <button
+                              onClick={() => handleViewShare(item.id)}
+                              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                            >
+                              查看分享
+                            </button>
+                            {item.deleteToken && (
+                              <button
+                                onClick={() => handleDeleteShare(item)}
+                                disabled={deletingIds.has(item.id)}
+                                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {deletingIds.has(item.id) ? '删除中...' : '删除'}
+                              </button>
+                            )}
+                          </>
                         )}
                         <button
                           onClick={() => navigator.clipboard.writeText(`${window.location.origin}/t/${item.id}`)}

@@ -7,6 +7,7 @@ export const CreateTextSchema = z.object({
   userName: z.string().max(50, '用户名称长度不能超过50个字符').optional(),
   displayType: z.enum(['text', 'qrcode'], '无效的展示类型'),
   expiryTime: z.enum(['1day', '7days', '30days'], '无效的过期时间'),
+  deleteToken: z.string().length(8, 'deleteToken 必须为8位').regex(/^[a-zA-Z0-9]+$/, 'deleteToken 只能包含字母和数字').optional(),
 });
 export type CreateTextInput = z.infer<typeof CreateTextSchema>;
 

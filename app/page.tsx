@@ -7,7 +7,7 @@ import { useForm, getFormProps, getInputProps, getTextareaProps } from '@conform
 import { parseWithZod } from '@conform-to/zod/v4';
 import { CreateTextSchema } from '@/service/schema';
 import { ShareHistory } from '@/service/types';
-import { getHistory, addHistory } from '@/service/history';
+import { getHistory, addHistory, generateDeleteToken } from '@/service/history';
 
 export default function Home() {
   const router = useRouter();
@@ -60,12 +60,18 @@ export default function Home() {
     setIsSubmitting(true);
 
     try {
+      // 生成删除token
+      const deleteToken = generateDeleteToken();
+
       const response = await fetch('/api/share', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(submission.value),
+        body: JSON.stringify({
+          ...submission.value,
+          deleteToken
+        }),
       });
 
       console.log(response);
@@ -95,7 +101,8 @@ export default function Home() {
         title: submission.value.text.slice(0, 50) + (submission.value.text.length > 50 ? '...' : ''),
         userName: submission.value.userName || '',
         createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + expiryOptions.find(opt => opt.value === submission.value.expiryTime)!.hours * 60 * 60 * 1000).toISOString()
+        expiresAt: new Date(Date.now() + expiryOptions.find(opt => opt.value === submission.value.expiryTime)!.hours * 60 * 60 * 1000).toISOString(),
+        deleteToken: deleteToken
       };
       addHistory(historyItem);
       setShareHistory(getHistory()); // 更新计数

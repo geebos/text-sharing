@@ -12,4 +12,5 @@ export interface ShareHistory {
   userName: string;
   createdAt: string;
   expiresAt: string;
+  deleteToken?: string;
 }
