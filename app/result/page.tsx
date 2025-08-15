@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import QRCodeDisplay from '@/app/components/QRCodeDisplay';
 
 interface ShareResult {
@@ -13,6 +14,7 @@ interface ShareResult {
 function ResultPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations();
   const [result, setResult] = useState<ShareResult | null>(null);
   const [copySuccess, setCopySuccess] = useState('');
   const [loading, setLoading] = useState(true);
@@ -40,14 +42,15 @@ function ResultPageContent() {
     initializeResult();
   }, [searchParams, router]);
 
-  const copyToClipboard = async (content: string, type: string) => {
+  const copyToClipboard = async (content: string, type: 'url') => {
     try {
       await navigator.clipboard.writeText(content);
-      setCopySuccess(`${type}已复制到剪贴板`);
+      const message = type === 'url' ? t('result.copySuccess.url') : '';
+      setCopySuccess(message);
       setTimeout(() => setCopySuccess(''), 2000);
     } catch (err) {
       console.error('复制失败:', err);
-      setCopySuccess('复制失败');
+      setCopySuccess(t('result.copyError'));
     }
   };
 
@@ -64,7 +67,7 @@ function ResultPageContent() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">加载中...</p>
+          <p className="text-gray-600">{t('result.loading')}</p>
         </div>
       </div>
     );
@@ -82,7 +85,7 @@ function ResultPageContent() {
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            返回首页
+            {t('result.backHome')}
           </button>
         </div>
       </div>
@@ -99,15 +102,15 @@ function ResultPageContent() {
                 </svg>
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                分享链接创建成功！
+                {t('result.success.title')}
               </h1>
-              <p className="text-lg text-gray-600">您的内容已安全分享，可以通过以下方式访问</p>
+              <p className="text-lg text-gray-600">{t('result.success.subtitle')}</p>
             </div>
 
             <div className="space-y-8">
               {/* Share URL Section */}
               <div className="bg-gray-50 rounded-lg p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">分享链接</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('result.shareUrl.title')}</h2>
                 <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:space-x-3">
                   <input
                     type="text"
@@ -123,16 +126,16 @@ function ResultPageContent() {
                       <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
-                      打开链接
+                      {t('result.shareUrl.open')}
                     </button>
                     <button
-                      onClick={() => copyToClipboard(result.shareUrl, '链接')}
+                      onClick={() => copyToClipboard(result.shareUrl, 'url')}
                       className="flex-1 md:flex-none px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors whitespace-nowrap"
                     >
                       <svg className="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       </svg>
-                      复制链接
+                      {t('result.shareUrl.copy')}
                     </button>
                   </div>
                 </div>
@@ -145,9 +148,9 @@ function ResultPageContent() {
                     content={result.shareUrl}
                     size="large"
                     showTitle={true}
-                    title="分享二维码"
+                    title={t('result.qrcode.title')}
                     showDescription={true}
-                    description="扫描二维码快速访问"
+                    description={t('result.qrcode.description')}
                     showBorder={true}
                     borderStyle="dashed"
                   />
@@ -176,7 +179,7 @@ function ResultPageContent() {
                     <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
-                    创建新的分享
+                    {t('result.actions.createNew')}
                   </button>
                   <button
                     onClick={viewHistory}
@@ -185,7 +188,7 @@ function ResultPageContent() {
                     <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    查看分享历史
+                    {t('result.actions.viewHistory')}
                   </button>
                 </div>
               </div>
@@ -197,11 +200,11 @@ function ResultPageContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div className="text-sm text-blue-800">
-                    <p className="font-medium mb-1">温馨提示：</p>
+                    <p className="font-medium mb-1">{t('result.tips.title')}</p>
                     <ul className="space-y-1 text-blue-700">
-                      <li>• 分享链接具有时效性，请在有效期内使用</li>
-                      <li>• 链接仅对知道完整URL的用户可见</li>
-                      <li>• 您可以在分享历史中管理和删除已创建的分享</li>
+                      <li>• {t('result.tips.items.0')}</li>
+                      <li>• {t('result.tips.items.1')}</li>
+                      <li>• {t('result.tips.items.2')}</li>
                     </ul>
                   </div>
                 </div>
@@ -219,7 +222,7 @@ function LoadingFallback() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">加载中...</p>
+        <p className="text-gray-600">Loading...</p>
       </div>
     </div>
   );

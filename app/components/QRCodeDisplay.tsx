@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import QRCode from 'qrcode';
 
 interface QRCodeDisplayProps {
@@ -32,18 +33,24 @@ export default function QRCodeDisplay({
   content,
   size = 'medium',
   showTitle = true,
-  title = '分享二维码',
+  title,
   showDescription = true,
-  description = '扫描二维码快速访问',
+  description,
   isPreview = false,
-  placeholderText = '生成中...',
+  placeholderText,
   className = '',
   showBorder = true,
   borderStyle = 'dashed'
 }: QRCodeDisplayProps) {
+  const t = useTranslations('qrcode');
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>('');  
+  
+  // Set default values using translations
+  const displayTitle = title || t('title');
+  const displayDescription = description || t('description');
+  const displayPlaceholder = placeholderText || t('generating');
 
   // 根据size获取二维码尺寸
   const getQRCodeSize = () => {
@@ -94,7 +101,7 @@ export default function QRCodeDisplay({
         setQrCodeUrl(qrCodeDataUrl);
       } catch (err) {
         console.error('生成二维码失败:', err);
-        setError('生成二维码失败');
+        setError(t('error'));
       } finally {
         setLoading(false);
       }
@@ -109,7 +116,7 @@ export default function QRCodeDisplay({
     <div className={`text-center ${className}`}>
       {showTitle && (
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          {title}
+          {displayTitle}
         </h3>
       )}
       
@@ -123,7 +130,7 @@ export default function QRCodeDisplay({
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600 mx-auto mb-2"></div>
               <span className="text-gray-500 text-xs">
-                {placeholderText}
+                {displayPlaceholder}
               </span>
             </div>
           </div>
@@ -141,13 +148,13 @@ export default function QRCodeDisplay({
         ) : isEmpty ? (
           <div className={`${getQRCodeSize()} bg-gray-100 flex items-center justify-center rounded`}>
             <span className="text-gray-400 text-xs text-center px-2">
-              {isPreview ? '输入内容后显示二维码' : '无内容可显示'}
+              {isPreview ? t('emptyPreview') : t('empty')}
             </span>
           </div>
         ) : qrCodeUrl ? (
           <img
             src={qrCodeUrl}
-            alt={title}
+            alt={displayTitle}
             className={`${getQRCodeSize()} mx-auto rounded`}
           />
         ) : null}
@@ -155,7 +162,7 @@ export default function QRCodeDisplay({
       
       {showDescription && !loading && !error && !isEmpty && (
         <p className="text-sm text-gray-500 mt-3">
-          {description}
+          {displayDescription}
         </p>
       )}
     </div>

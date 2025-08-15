@@ -1,0 +1,212 @@
+{
+  "app": {
+    "title": "TextSharing - Secure and Convenient Text Sharing Platform",
+    "description": "Secure, private, and convenient text sharing platform"
+  },
+  "home": {
+    "title": "TextSharing",
+    "subtitle": "Secure, private, and convenient text sharing platform",
+    "form": {
+      "userName": {
+        "label": "User Name (Optional)",
+        "placeholder": "Enter name (to identify the sharer)",
+        "counter": "{current}/{max}"
+      },
+      "text": {
+        "label": "Text Content *",
+        "placeholder": "Please enter the text content to share...",
+        "counter": "{current}/{max}"
+      },
+      "expiryTime": {
+        "label": "Expiry Time *",
+        "options": {
+          "1day": "1 Day",
+          "7days": "7 Days",
+          "30days": "30 Days"
+        }
+      },
+      "displayType": {
+        "label": "Share Type",
+        "text": "Text",
+        "qrcode": "QR Code"
+      },
+      "qrcode": {
+        "readFromQR": "Read from QR Code",
+        "processing": "Processing...",
+        "uploadError": "Please select an image file",
+        "canvasError": "Cannot create canvas context",
+        "loadError": "Image loading failed",
+        "detectError": "No QR code detected in the image, please ensure the image is clear and contains a QR code",
+        "recognitionError": "QR code recognition failed, please try again"
+      },
+      "submit": {
+        "creating": "Creating...",
+        "create": "Create Share Link",
+        "submitError": "Submission failed",
+        "submitErrorRetry": "Submission failed, please try again"
+      },
+      "history": {
+        "button": "View Share History"
+      }
+    },
+    "features": {
+      "privacy": {
+        "title": "Privacy & Security",
+        "description": "Search engine indexing prevention, expiry time setting, random URL generation to ensure your content is safe and private"
+      },
+      "history": {
+        "title": "History Management",
+        "description": "Automatically save share history for easy management and viewing of previous shared content"
+      },
+      "qrcode": {
+        "title": "QR Code Support",
+        "description": "Automatically generate QR codes for convenient mobile device scanning and sharing"
+      }
+    },
+    "preview": {
+      "placeholder": "Please enter text content...",
+      "mode": "Preview Mode"
+    }
+  },
+  "textView": {
+    "title": {
+      "withUser": "Text shared by {userName}",
+      "withoutUser": "Shared Text"
+    },
+    "createNew": "Create New Share",
+    "createdAt": "Created at: {date}",
+    "expiry": {
+      "expired": "Expired",
+      "daysLeft": "Expires in {days} days",
+      "hoursLeft": "Expires in {hours} hours"
+    },
+    "content": {
+      "label": "Text Content",
+      "copy": "Copy Text",
+      "placeholder": "Please enter text content..."
+    },
+    "qrcode": {
+      "title": "Share QR Code",
+      "description": "Scan QR code to get text content",
+      "placeholder": "QR code will appear after entering content",
+      "generating": "Generating..."
+    },
+    "shareUrl": {
+      "label": "Share Link",
+      "labelPreview": "Share Link (Preview)",
+      "copy": "Copy Link"
+    },
+    "copySuccess": {
+      "text": "Text copied to clipboard",
+      "url": "Link copied to clipboard"
+    },
+    "copyError": "Copy failed",
+    "error": {
+      "title": "Something went wrong",
+      "message": "Text does not exist or has expired",
+      "backHome": "Back to Home"
+    }
+  },
+  "result": {
+    "backHome": "Back to Home",
+    "loading": "Loading...",
+    "success": {
+      "title": "Share Link Created Successfully!",
+      "subtitle": "Your content has been securely shared and can be accessed through the following methods"
+    },
+    "shareUrl": {
+      "title": "Share Link",
+      "open": "Open Link",
+      "copy": "Copy Link"
+    },
+    "qrcode": {
+      "title": "Share QR Code",
+      "description": "Scan QR code for quick access"
+    },
+    "actions": {
+      "createNew": "Create New Share",
+      "viewHistory": "View Share History"
+    },
+    "tips": {
+      "title": "Tips:",
+      "items": [
+        "Share links have expiry times, please use within the valid period",
+        "Links are only visible to users who know the complete URL",
+        "You can manage and delete created shares in the share history"
+      ]
+    },
+    "copySuccess": {
+      "url": "Link copied to clipboard"
+    },
+    "copyError": "Copy failed"
+  },
+  "history": {
+    "backHome": "Back to Home",
+    "title": "Share History",
+    "subtitle": "View and manage all your share records",
+    "createNew": "Create New Share",
+    "stats": {
+      "total": "Total Shares",
+      "active": "Active Shares",
+      "expired": "Expired"
+    },
+    "list": {
+      "title": "History Records",
+      "clearExpired": "Clear Expired Records",
+      "noExpiredConfirm": "No expired records to clean up",
+      "clearConfirm": "Are you sure you want to clear {count} expired share history records?"
+    },
+    "empty": {
+      "title": "No Share History",
+      "subtitle": "You haven't created any share records yet",
+      "createFirst": "Create First Share"
+    },
+    "item": {
+      "createdAt": "Created:",
+      "status": "Status:",
+      "expired": "Expired",
+      "active": "Active",
+      "view": "View Share",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "copyLink": "Copy Link"
+    },
+    "delete": {
+      "noPermission": "This share record was created without delete permission and cannot be deleted. Only newly created share records can be deleted.",
+      "confirm": "Are you sure you want to delete share \"{title}\"? This action cannot be undone.",
+      "success": "Deleted successfully",
+      "error": "Delete failed, please try again"
+    },
+    "expiry": {
+      "expired": "Expired",
+      "daysLeft": "Expires in {days} days",
+      "hoursLeft": "Expires in {hours} hours",
+      "minutesLeft": "Expires in {minutes} minutes"
+    }
+  },
+  "qrcode": {
+    "title": "Share QR Code",
+    "description": "Scan QR code for quick access",
+    "generating": "Generating...",
+    "error": "Failed to generate QR code",
+    "empty": "No content to display",
+    "emptyPreview": "QR code will appear after entering content"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "copy": "Copy",
+    "delete": "Delete",
+    "create": "Create",
+    "view": "View",
+    "back": "Back"
+  },
+  "language": {
+    "switch": "Switch Language",
+    "chinese": "中文",
+    "english": "English"
+  }
+}

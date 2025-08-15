@@ -1,0 +1,212 @@
+{
+  "app": {
+    "title": "TextSharing - 安全便捷的文本分享平台",
+    "description": "安全、私密、便捷的文本分享平台"
+  },
+  "home": {
+    "title": "TextSharing",
+    "subtitle": "安全、私密、便捷的文本分享平台",
+    "form": {
+      "userName": {
+        "label": "用户名称 (可选)",
+        "placeholder": "输入名称（用于标识分享者）",
+        "counter": "{current}/{max}"
+      },
+      "text": {
+        "label": "文本内容 *",
+        "placeholder": "请输入要分享的文本内容...",
+        "counter": "{current}/{max}"
+      },
+      "expiryTime": {
+        "label": "过期时间 *",
+        "options": {
+          "1day": "1天",
+          "7days": "7天",
+          "30days": "30天"
+        }
+      },
+      "displayType": {
+        "label": "分享类型",
+        "text": "文本",
+        "qrcode": "二维码"
+      },
+      "qrcode": {
+        "readFromQR": "从二维码读取",
+        "processing": "处理中...",
+        "uploadError": "请选择图片文件",
+        "canvasError": "无法创建canvas上下文",
+        "loadError": "图片加载失败",
+        "detectError": "未在图片中检测到二维码，请确保图片清晰且包含二维码",
+        "recognitionError": "二维码识别失败，请重试"
+      },
+      "submit": {
+        "creating": "创建中...",
+        "create": "创建分享链接",
+        "submitError": "提交失败",
+        "submitErrorRetry": "提交失败，请重试"
+      },
+      "history": {
+        "button": "查看分享历史"
+      }
+    },
+    "features": {
+      "privacy": {
+        "title": "隐私安全",
+        "description": "防搜索引擎索引、设置有效期限、随机 URL 生成，确保您的内容安全私密"
+      },
+      "history": {
+        "title": "历史记录管理",
+        "description": "自动保存分享历史，方便管理和查看之前的分享内容"
+      },
+      "qrcode": {
+        "title": "支持二维码",
+        "description": "自动生成二维码，方便移动设备扫码访问和分享"
+      }
+    },
+    "preview": {
+      "placeholder": "请输入文本内容...",
+      "mode": "预览模式"
+    }
+  },
+  "textView": {
+    "title": {
+      "withUser": "{userName} 分享的文本",
+      "withoutUser": "分享的文本"
+    },
+    "createNew": "创建新分享",
+    "createdAt": "创建时间：{date}",
+    "expiry": {
+      "expired": "已过期",
+      "daysLeft": "{days}天后过期",
+      "hoursLeft": "{hours}小时后过期"
+    },
+    "content": {
+      "label": "文本内容",
+      "copy": "复制文本",
+      "placeholder": "请输入文本内容..."
+    },
+    "qrcode": {
+      "title": "分享二维码",
+      "description": "扫描二维码获取文本内容",
+      "placeholder": "输入内容后显示二维码",
+      "generating": "生成中..."
+    },
+    "shareUrl": {
+      "label": "分享链接",
+      "labelPreview": "分享链接（预览）",
+      "copy": "复制链接"
+    },
+    "copySuccess": {
+      "text": "文本已复制到剪贴板",
+      "url": "链接已复制到剪贴板"
+    },
+    "copyError": "复制失败",
+    "error": {
+      "title": "出错了",
+      "message": "文本不存在或已过期",
+      "backHome": "返回首页"
+    }
+  },
+  "result": {
+    "backHome": "返回首页",
+    "loading": "加载中...",
+    "success": {
+      "title": "分享链接创建成功！",
+      "subtitle": "您的内容已安全分享，可以通过以下方式访问"
+    },
+    "shareUrl": {
+      "title": "分享链接",
+      "open": "打开链接",
+      "copy": "复制链接"
+    },
+    "qrcode": {
+      "title": "分享二维码",
+      "description": "扫描二维码快速访问"
+    },
+    "actions": {
+      "createNew": "创建新的分享",
+      "viewHistory": "查看分享历史"
+    },
+    "tips": {
+      "title": "温馨提示：",
+      "items": [
+        "分享链接具有时效性，请在有效期内使用",
+        "链接仅对知道完整URL的用户可见",
+        "您可以在分享历史中管理和删除已创建的分享"
+      ]
+    },
+    "copySuccess": {
+      "url": "链接已复制到剪贴板"
+    },
+    "copyError": "复制失败"
+  },
+  "history": {
+    "backHome": "返回首页",
+    "title": "分享历史",
+    "subtitle": "查看和管理您的所有分享记录",
+    "createNew": "创建新分享",
+    "stats": {
+      "total": "总分享数",
+      "active": "有效分享",
+      "expired": "已过期"
+    },
+    "list": {
+      "title": "历史记录",
+      "clearExpired": "清空过期记录",
+      "noExpiredConfirm": "没有过期的记录需要清理",
+      "clearConfirm": "确定要清空 {count} 条过期的分享历史吗？"
+    },
+    "empty": {
+      "title": "暂无分享历史",
+      "subtitle": "您还没有创建任何分享记录",
+      "createFirst": "创建第一个分享"
+    },
+    "item": {
+      "createdAt": "创建时间:",
+      "status": "状态:",
+      "expired": "已过期",
+      "active": "有效",
+      "view": "查看分享",
+      "delete": "删除",
+      "deleting": "删除中...",
+      "copyLink": "复制链接"
+    },
+    "delete": {
+      "noPermission": "此分享记录创建时没有删除权限，无法删除。只能删除新创建的分享记录。",
+      "confirm": "确定要删除分享\"{title}\"吗？删除后将无法恢复。",
+      "success": "删除成功",
+      "error": "删除失败，请重试"
+    },
+    "expiry": {
+      "expired": "已过期",
+      "daysLeft": "{days}天后过期",
+      "hoursLeft": "{hours}小时后过期",
+      "minutesLeft": "{minutes}分钟后过期"
+    }
+  },
+  "qrcode": {
+    "title": "分享二维码",
+    "description": "扫描二维码快速访问",
+    "generating": "生成中...",
+    "error": "生成二维码失败",
+    "empty": "无内容可显示",
+    "emptyPreview": "输入内容后显示二维码"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "出错了",
+    "retry": "重试",
+    "confirm": "确认",
+    "cancel": "取消",
+    "copy": "复制",
+    "delete": "删除",
+    "create": "创建",
+    "view": "查看",
+    "back": "返回"
+  },
+  "language": {
+    "switch": "切换语言",
+    "chinese": "中文",
+    "english": "English"
+  }
+}

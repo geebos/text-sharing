@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import { useForm, getFormProps, getInputProps, getTextareaProps } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod/v4';
@@ -12,6 +13,7 @@ import TextView from '@/app/components/t/TextView';
 
 export default function Home() {
   const router = useRouter();
+  const t = useTranslations();
   const [now, setNow] = useState<Date>(new Date(2025, 1, 1, 1, 1, 1));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessingQR, setIsProcessingQR] = useState(false);
@@ -41,9 +43,9 @@ export default function Home() {
   }, []);
 
   const expiryOptions = [
-    { value: '1day', label: '1天', hours: 24 },
-    { value: '7days', label: '7天', hours: 24 * 7 },
-    { value: '30days', label: '30天', hours: 24 * 30 }
+    { value: '1day', label: t('home.form.expiryTime.options.1day'), hours: 24 },
+    { value: '7days', label: t('home.form.expiryTime.options.7days'), hours: 24 * 7 },
+    { value: '30days', label: t('home.form.expiryTime.options.30days'), hours: 24 * 30 }
   ];
 
   const getExpiryHours = (expiryTime: string) => {
@@ -58,7 +60,7 @@ export default function Home() {
 
     // 验证文件类型
     if (!file.type.startsWith('image/')) {
-      alert('请选择图片文件');
+      alert(t('home.form.qrcode.uploadError'));
       return;
     }
 
@@ -74,13 +76,13 @@ export default function Home() {
       const ctx = canvas.getContext('2d');
 
       if (!ctx) {
-        throw new Error('无法创建canvas上下文');
+        throw new Error(t('home.form.qrcode.canvasError'));
       }
 
       // 加载图片
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
-        img.onerror = () => reject(new Error('图片加载失败'));
+        img.onerror = () => reject(new Error(t('home.form.qrcode.loadError')));
         img.src = URL.createObjectURL(file);
       });
 
@@ -106,7 +108,7 @@ export default function Home() {
           textArea.dispatchEvent(event);
         }
       } else {
-        alert('未在图片中检测到二维码，请确保图片清晰且包含二维码');
+        alert(t('home.form.qrcode.detectError'));
       }
 
       // 清理资源
@@ -114,7 +116,7 @@ export default function Home() {
 
     } catch (error) {
       console.error('二维码识别失败:', error);
-      alert('二维码识别失败，请重试');
+      alert(t('home.form.qrcode.recognitionError'));
     } finally {
       setIsProcessingQR(false);
       // 清空文件输入
@@ -158,7 +160,7 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        alert(errorData.error || '提交失败');
+        alert(errorData.error || t('home.form.submit.submitError'));
         return;
       }
 
@@ -180,7 +182,7 @@ export default function Home() {
 
     } catch (error) {
       console.error('提交失败:', error);
-      alert('提交失败，请重试');
+      alert(t('home.form.submit.submitErrorRetry'));
     } finally {
       setIsSubmitting(false);
     }
@@ -192,10 +194,10 @@ export default function Home() {
       <div className="pt-16 pb-12 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            TextSharing
+            {t('home.title')}
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            安全、私密、便捷的文本分享平台
+            {t('home.subtitle')}
           </p>
         </div>
       </div>
@@ -211,11 +213,11 @@ export default function Home() {
                     {/* 用户名称输入 */}
                     <div>
                       <label htmlFor={fields.userName.id} className="block text-sm font-medium text-gray-700 mb-2">
-                        用户名称 (可选)
+                        {t('home.form.userName.label')}
                       </label>
                       <input
                         {...getInputProps(fields.userName, { type: 'text' })}
-                        placeholder="输入名称（用于标识分享者）"
+                        placeholder={t('home.form.userName.placeholder')}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         maxLength={50}
                       />
@@ -232,11 +234,11 @@ export default function Home() {
                     {/* 文本输入区域 */}
                     <div>
                       <label htmlFor={fields.text.id} className="block text-sm font-medium text-gray-700 mb-2">
-                        文本内容 *
+                        {t('home.form.text.label')}
                       </label>
                       <textarea
                         {...getTextareaProps(fields.text)}
-                        placeholder="请输入要分享的文本内容..."
+                        placeholder={t('home.form.text.placeholder')}
                         className="w-full h-24 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                         maxLength={maxLength}
                       />
@@ -255,7 +257,7 @@ export default function Home() {
                     {/* 过期时间选择 */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        过期时间 *
+                        {t('home.form.expiryTime.label')}
                       </label>
                       <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:gap-4">
                         {expiryOptions.map((option) => (
@@ -278,7 +280,7 @@ export default function Home() {
                     {/* 展示类型选择 */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        分享类型
+                        {t('home.form.displayType.label')}
                       </label>
                       <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:gap-4">
                         <label className="flex items-center">
@@ -286,7 +288,7 @@ export default function Home() {
                             {...getInputProps(fields.displayType, { type: 'radio', value: 'text' })}
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                           />
-                          <span className="ml-2 text-sm text-gray-700">文本</span>
+                          <span className="ml-2 text-sm text-gray-700">{t('home.form.displayType.text')}</span>
                         </label>
                         <div className="flex items-center gap-2">
                           <label className="flex items-center">
@@ -294,7 +296,7 @@ export default function Home() {
                               {...getInputProps(fields.displayType, { type: 'radio', value: 'qrcode' })}
                               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                             />
-                            <span className="ml-2 text-sm text-gray-700">二维码</span>
+                            <span className="ml-2 text-sm text-gray-700">{t('home.form.displayType.qrcode')}</span>
                           </label>
                           {fields.displayType.value === 'qrcode' && (
                             <button
@@ -303,7 +305,7 @@ export default function Home() {
                               disabled={isProcessingQR}
                               className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-{isProcessingQR ? '处理中...' : '从二维码读取'}
+                              {isProcessingQR ? t('home.form.qrcode.processing') : t('home.form.qrcode.readFromQR')}
                             </button>
                           )}
                         </div>
@@ -331,7 +333,7 @@ export default function Home() {
                     disabled={isSubmitting || !(fields.text.value || '').trim()}
                     className="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    {isSubmitting ? '创建中...' : '创建分享链接'}
+                    {isSubmitting ? t('home.form.submit.creating') : t('home.form.submit.create')}
                   </button>
                 </form>
 
@@ -345,7 +347,7 @@ export default function Home() {
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      查看分享历史
+                      {t('home.form.history.button')}
                       {shareHistory.length > 0 && (
                         <span className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded-full">
                           {shareHistory.length}
@@ -360,7 +362,7 @@ export default function Home() {
               <TextView
                 data={{
                   id: 'preview',
-                  text: fields.text.value || '请输入文本内容...',
+                  text: fields.text.value || t('home.preview.placeholder'),
                   userName: fields.userName.value,
                   displayType: fields.displayType.value as 'text' | 'qrcode' || 'text',
                   createdAt: new Date().toISOString(),
@@ -383,9 +385,9 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">隐私安全</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('home.features.privacy.title')}</h3>
               <p className="text-gray-600 text-sm">
-                防搜索引擎索引、设置有效期限、随机 URL 生成，确保您的内容安全私密
+                {t('home.features.privacy.description')}
               </p>
             </div>
 
@@ -395,9 +397,9 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">历史记录管理</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('home.features.history.title')}</h3>
               <p className="text-gray-600 text-sm">
-                自动保存分享历史，方便管理和查看之前的分享内容
+                {t('home.features.history.description')}
               </p>
             </div>
 
@@ -407,9 +409,9 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">支持二维码</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('home.features.qrcode.title')}</h3>
               <p className="text-gray-600 text-sm">
-                自动生成二维码，方便移动设备扫码访问和分享
+                {t('home.features.qrcode.description')}
               </p>
             </div>
           </div>
