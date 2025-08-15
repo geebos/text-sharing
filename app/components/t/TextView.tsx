@@ -53,6 +53,14 @@ export default function TextView({ data, href, isPreview = false, onCreateNew }:
     }
   };
 
+  const isUrl = (text: string) => {
+    return text && (text.startsWith('https://') || text.startsWith('http://'));
+  };
+
+  const openLink = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   const isEmptyText = !data.text || data.text === t('home.preview.placeholder');
 
   return (
@@ -116,13 +124,24 @@ export default function TextView({ data, href, isPreview = false, onCreateNew }:
               <label className="block text-sm font-medium text-gray-700">
                 {t('textView.content.label')}
               </label>
-              <button
-                onClick={() => copyToClipboard(data.text, 'text')}
-                disabled={isEmptyText}
-                className={`px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isPreview ? 'text-xs px-2' : ''}`}
-              >
-                {t('textView.content.copy')}
-              </button>
+              <div className="flex gap-2">
+                {isUrl(data.text) && (
+                  <button
+                    onClick={() => openLink(data.text)}
+                    disabled={isEmptyText}
+                    className={`px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isPreview ? 'text-xs px-2' : ''}`}
+                  >
+                    {t('textView.content.openLink')}
+                  </button>
+                )}
+                <button
+                  onClick={() => copyToClipboard(data.text, 'text')}
+                  disabled={isEmptyText}
+                  className={`px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isPreview ? 'text-xs px-2' : ''}`}
+                >
+                  {t('textView.content.copy')}
+                </button>
+              </div>
             </div>
             <div className="bg-gray-50 border border-gray-300 rounded-md p-4">
               <div className={`${isPreview ? 'min-h-[60px]' : ''} flex items-start`}>

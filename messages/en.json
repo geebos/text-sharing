@@ -83,6 +83,7 @@
     "content": {
       "label": "Text Content",
       "copy": "Copy Text",
+      "openLink": "Open Link",
       "placeholder": "Please enter text content..."
     },
     "qrcode": {

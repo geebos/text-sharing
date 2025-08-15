@@ -83,6 +83,7 @@
     "content": {
       "label": "文本内容",
       "copy": "复制文本",
+      "openLink": "打开链接",
       "placeholder": "请输入文本内容..."
     },
     "qrcode": {
