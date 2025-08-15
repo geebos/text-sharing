@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRedisClient, generateId, getExpirySeconds } from '@/lib/redis';
 import { CreateTextSchema, firstError } from '@/service/schema';
+import { withRateLimit } from '@/lib/middleware/ratelimit';
 
-export async function POST(request: NextRequest) {
+export const POST = withRateLimit('c:share', async (request: NextRequest) => {
   const { text, userName, expiryTime, displayType, deleteToken } = await request.json();
   try {
     CreateTextSchema.parse({ text, userName, expiryTime, displayType, deleteToken });
@@ -43,18 +44,18 @@ export async function POST(request: NextRequest) {
     console.error('API错误:', error);
     return NextResponse.json({ error: '服务器内部错误' }, { status: 500 });
   }
-}
+});
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = async (request: NextRequest) => {
   try {
     const { id, deleteToken } = await request.json();
-    
+
     if (!id || !deleteToken) {
       return NextResponse.json({ error: '缺少必要参数' }, { status: 400 });
     }
 
     const redis = await getRedisClient();
-    
+
     // 获取存储的数据
     const storedData = await redis.get(`text:${id}`);
     if (!storedData) {
@@ -62,7 +63,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     const data = JSON.parse(storedData);
-    
+
     // 验证删除token
     if (data.deleteToken !== deleteToken) {
       return NextResponse.json({ error: '删除权限验证失败' }, { status: 403 });
@@ -70,7 +71,7 @@ export async function DELETE(request: NextRequest) {
 
     // 删除记录
     await redis.del(`text:${id}`);
-    
+
     return NextResponse.json({ success: true });
 
   } catch (error) {
