@@ -36,7 +36,7 @@ export default function LanguageSwitcher() {
       // 设置语言偏好到 cookie，使用更可靠的方式
       const expires = new Date();
       expires.setFullYear(expires.getFullYear() + 1); // 1 year from now
-      document.cookie = `preferred-locale=${newLocale}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
+      document.cookie = `locale=${newLocale}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
       
       // 使用 window.location.href 而不是 reload() 来确保完全重新加载
       window.location.href = window.location.href;
