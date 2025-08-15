@@ -1,0 +1,62 @@
+CUSTOM LICENSE AGREEMENT (Version 2025-08-15)
+
+Copyright (c) 2025 Text Sharing
+All rights reserved.
+
+NOTICE
+This is NOT an open source license as defined by the Open Source Initiative (OSI). The source code is provided for limited purposes only and is not freely reusable or redistributable except as expressly permitted below.
+
+1. PERMITTED USES
+You are granted a limited, non-exclusive, non-transferable, revocable license to:
+- View, review, and analyze the source code for personal learning, research, or security auditing.
+- Temporarily copy or modify the code solely for local, non-public analysis or review purposes, provided all such copies and modifications are deleted upon completion of the permitted activities.
+- Quote brief excerpts for the purpose of criticism, review, or scholarly discussion, strictly within the bounds of applicable copyright law and non-commercial intent.
+- Use within an internal organization only by authorized personnel, without granting access to any third party, except as expressly allowed below.
+- Deploy and run the software on local or online servers, and provide access to users, strictly for non-commercial purposes. Such access must not involve charging fees, displaying advertisements, or otherwise directly or indirectly obtaining economic benefit. The deployer must ensure that the scope, number of users, and usage patterns comply with all other restrictions in this Agreement.
+
+2. PROHIBITED USES
+You may NOT:
+- Copy, modify, distribute, or make available the code, except as expressly permitted in Section 1.
+- Use the code, or any portion thereof, for commercial purposes, including but not limited to:
+  - Direct sale or licensing.
+  - Incorporation into any paid or ad-supported service.
+  - Use in consulting services or any activity that generates direct or indirect economic benefit.
+- Republish, sublicense, or create derivative works based on the code, except for brief quotations as described in Section 1.
+- Redistribute the code in any form or medium, whether modified or unmodified.
+- Use the code in any production environment or incorporate it into any other project or product, except for the non-commercial deployment and user access expressly allowed in Section 1.
+- Sell, rent, or bundle access to the software with any paid service.
+- Collect or use user data obtained through the software for commercial purposes.
+- Reverse engineer, decompile, or disassemble the code for the purpose of circumventing these restrictions.
+
+3. THIRD-PARTY COMPONENTS
+If this project includes third-party libraries or components licensed under open source or other licenses:
+- All original license notices and attributions for such components must be retained, and in any allowed distribution, the full text of the original licenses must be provided.
+- The use of such components remains subject to their original license terms, which may impose additional obligations.
+- In the event of any conflict between this License and the applicable license for a third-party component, the latter shall prevail solely for that component.
+
+4. TERMINATION
+This license will automatically terminate without notice if you violate any term or condition stated herein. Upon termination, you must immediately:
+- Cease all use of the code.
+- Delete all copies and modifications in your possession or control.
+
+5. COPYRIGHT NOTICE
+This project and all associated code are protected by copyright law.
+The author retains all rights to this work.
+No part of this software may be reproduced, distributed, or transmitted in any form or by any means, including photocopying, recording, or other electronic or mechanical methods, without the prior written permission of the copyright holder, except as expressly permitted above or as allowed by applicable copyright law.
+
+6. DISCLAIMER OF WARRANTY AND LIMITATION OF LIABILITY
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY (INCLUDING, WITHOUT LIMITATION, LOST PROFITS OR BUSINESS INTERRUPTION), WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+7. APPLICABLE LAW AND JURISDICTION
+This Agreement shall be governed by and construed in accordance with the laws of the People’s Republic of China, excluding its conflict of law rules and excluding the United Nations Convention on Contracts for the International Sale of Goods (CISG).
+Any disputes arising out of or in connection with this Agreement shall be subject to the exclusive jurisdiction of the courts located in the People’s Republic of China.
+If any provision of this Agreement is found invalid under applicable mandatory law, the remaining provisions shall remain in full force and effect.
+
+8. UPDATES TO THIS LICENSE
+The copyright holder reserves the right to update or modify this License at any time.
+Continued use of the code after such updates constitutes acceptance of the revised terms.
+
+9. CONTACT
+For permissions beyond the scope of this license, please contact the copyright holder at:
+https://github.com/geebos

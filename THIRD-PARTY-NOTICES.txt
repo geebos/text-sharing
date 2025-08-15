@@ -1,0 +1,85 @@
+THIRD-PARTY-NOTICES
+-------------------
+
+This project includes the following third-party software, which is subject to the licenses listed below.  
+The text of each license is provided in full or by reference to its source.
+
+-------------------------------------------------------------------------------
+Package: @conform-to/react
+Version: ^1.8.2
+License: MIT
+Copyright: Copyright (c) Conform authors
+License Text: https://opensource.org/licenses/MIT
+-------------------------------------------------------------------------------
+Package: @conform-to/zod
+Version: ^1.8.2
+License: MIT
+Copyright: Copyright (c) Conform authors
+License Text: https://opensource.org/licenses/MIT
+-------------------------------------------------------------------------------
+Package: @vercel/analytics
+Version: ^1.5.0
+License: Mozilla Public License 2.0
+Copyright: Copyright (c) Vercel, Inc.
+License Text: https://www.mozilla.org/MPL/2.0/
+-------------------------------------------------------------------------------
+Package: @vercel/speed-insights
+Version: ^1.2.0
+License: Apache License 2.0
+Copyright: Copyright (c) Vercel, Inc.
+License Text: https://www.apache.org/licenses/LICENSE-2.0
+-------------------------------------------------------------------------------
+Package: firebase
+Version: ^12.0.0
+License: Apache License 2.0
+Copyright: Copyright (c) Google Inc.
+License Text: https://www.apache.org/licenses/LICENSE-2.0
+-------------------------------------------------------------------------------
+Package: jsqr
+Version: ^1.4.0
+License: Apache License 2.0
+Copyright: Copyright (c) Authors of jsQR
+License Text: https://www.apache.org/licenses/LICENSE-2.0
+-------------------------------------------------------------------------------
+Package: next
+Version: 15.4.4
+License: MIT
+Copyright: Copyright (c) Vercel, Inc.
+License Text: https://opensource.org/licenses/MIT
+-------------------------------------------------------------------------------
+Package: qrcode
+Version: ^1.5.3
+License: MIT
+Copyright: Copyright (c) Kazuhiko Arase
+License Text: https://opensource.org/licenses/MIT
+-------------------------------------------------------------------------------
+Package: react
+Version: 19.1.0
+License: MIT
+Copyright: Copyright (c) Meta Platforms, Inc. and affiliates.
+License Text: https://opensource.org/licenses/MIT
+-------------------------------------------------------------------------------
+Package: react-dom
+Version: 19.1.0
+License: MIT
+Copyright: Copyright (c) Meta Platforms, Inc. and affiliates.
+License Text: https://opensource.org/licenses/MIT
+-------------------------------------------------------------------------------
+Package: redis
+Version: ^5.7.0
+License: MIT
+Copyright: Copyright (c) Node Redis contributors
+License Text: https://opensource.org/licenses/MIT
+-------------------------------------------------------------------------------
+Package: zod
+Version: ^4.0.14
+License: MIT
+Copyright: Copyright (c) 2020 Colin McDonnell
+License Text: https://opensource.org/licenses/MIT
+-------------------------------------------------------------------------------
+
+NOTE: For Apache-2.0 licensed packages, if a NOTICE file is included in the package, you must retain it in your distribution.
+For MPL-2.0 licensed packages, if you modify covered source files and distribute them, you must make the modified files available under MPL-2.0.
+
+END OF THIRD-PARTY-NOTICES
+
