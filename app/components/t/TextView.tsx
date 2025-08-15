@@ -145,12 +145,7 @@ export default function TextView({ data, href, isPreview = false, onCreateNew }:
           {data.displayType === 'qrcode' && (
             <div className="mb-6">
               <QRCodeDisplay
-                content={isPreview
-                  ? (typeof window !== 'undefined' && !isEmptyText
-                    ? `${window.location.origin}/t/preview-${Date.now()}`
-                    : '')
-                  : data.text
-                }
+                content={data.text}
                 size={isPreview ? 'small' : 'medium'}
                 showTitle={true}
                 title={t('textView.qrcode.title')}

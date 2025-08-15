@@ -67,42 +67,17 @@ export default function Home() {
     setIsProcessingQR(true);
 
     try {
-      // 动态加载 jsQR 库
-      const { default: jsQR } = await import('jsqr');
+      // 动态加载 zxing 库
+      const { BrowserQRCodeReader } = await import('@zxing/browser');
+      const codeReader = new BrowserQRCodeReader()
+      const result = await codeReader.decodeFromImageUrl(URL.createObjectURL(file));
 
-      // 创建图片元素
-      const img = new Image();
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      if (!ctx) {
-        throw new Error(t('home.form.qrcode.canvasError'));
-      }
-
-      // 加载图片
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error(t('home.form.qrcode.loadError')));
-        img.src = URL.createObjectURL(file);
-      });
-
-      // 设置canvas尺寸并绘制图片
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-
-      // 获取图片数据
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-      // 使用jsQR识别二维码
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
-
-      if (code) {
+      if (result) {
         // 识别成功，填充到文本框
         // 直接操作DOM元素来设置值
         const textArea = document.querySelector(`textarea[name="${fields.text.name}"]`) as HTMLTextAreaElement;
         if (textArea) {
-          textArea.value = code.data;
+          textArea.value = result.getText();
           // 触发change事件以确保React状态同步
           const event = new Event('input', { bubbles: true });
           textArea.dispatchEvent(event);
@@ -110,10 +85,6 @@ export default function Home() {
       } else {
         alert(t('home.form.qrcode.detectError'));
       }
-
-      // 清理资源
-      URL.revokeObjectURL(img.src);
-
     } catch (error) {
       console.error('二维码识别失败:', error);
       alert(t('home.form.qrcode.recognitionError'));
