@@ -206,171 +206,173 @@ export default function Home() {
       <div className="px-4 pb-8">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Form Section */}
-              <div className="bg-white rounded-lg shadow-sm p-4 md:p-8">
-                <form {...getFormProps(form)} onSubmit={handleSubmit} action="#" className="space-y-6">
+            {/* Form Section */}
+            <div className="bg-white rounded-lg shadow-sm p-4 md:p-8">
+              <form {...getFormProps(form)} onSubmit={handleSubmit} action="#" className="space-y-6">
+                <div>
+                  {/* 用户名称输入 */}
                   <div>
-                    {/* 用户名称输入 */}
-                    <div>
-                      <label htmlFor={fields.userName.id} className="block text-sm font-medium text-gray-700 mb-2">
-                        {t('home.form.userName.label')}
-                      </label>
-                      <input
-                        {...getInputProps(fields.userName, { type: 'text' })}
-                        placeholder={t('home.form.userName.placeholder')}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        maxLength={50}
-                      />
-                      <div className="text-right text-sm text-gray-500 mt-1">
-                        {(fields.userName.value || '').length}/50
-                      </div>
-                      {fields.userName.errors && (
-                        <div className="text-red-600 text-sm mt-1">
-                          {fields.userName.errors}
-                        </div>
-                      )}
+                    <label htmlFor={fields.userName.id} className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('home.form.userName.label')}
+                    </label>
+                    <input
+                      {...getInputProps(fields.userName, { type: 'text' })}
+                      placeholder={t('home.form.userName.placeholder')}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      maxLength={50}
+                    />
+                    <div className="text-right text-sm text-gray-500 mt-1">
+                      {(fields.userName.value || '').length}/50
                     </div>
+                    {fields.userName.errors && (
+                      <div className="text-red-600 text-sm mt-1">
+                        {fields.userName.errors}
+                      </div>
+                    )}
+                  </div>
 
-                    {/* 文本输入区域 */}
-                    <div>
-                      <label htmlFor={fields.text.id} className="block text-sm font-medium text-gray-700 mb-2">
-                        {t('home.form.text.label')}
-                      </label>
-                      <textarea
-                        {...getTextareaProps(fields.text)}
-                        placeholder={t('home.form.text.placeholder')}
-                        className="w-full h-24 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                        maxLength={maxLength}
-                      />
-                      <div className="text-right text-sm text-gray-500 mt-1">
+                  {/* 文本输入区域 */}
+                  <div>
+                    <label htmlFor={fields.text.id} className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('home.form.text.label')}
+                    </label>
+                    <textarea
+                      {...getTextareaProps(fields.text)}
+                      placeholder={t('home.form.text.placeholder')}
+                      className="w-full h-24 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                      maxLength={maxLength}
+                    />
+                    <div className="flex items-center justify-between">
+                      {fields.displayType.value === 'qrcode' && (
+                        <button
+                          type="button"
+                          onClick={handleQRCodeReadClick}
+                          disabled={isProcessingQR}
+                          className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isProcessingQR ? t('home.form.qrcode.processing') : t('home.form.qrcode.readFromQR')}
+                        </button>
+                      )}
+                      <div className="text-right text-sm text-gray-500 mt-1 flex-1">
                         {(fields.text.value || '').length}/{maxLength}
                       </div>
-                      {fields.text.errors && (
-                        <div className="text-red-600 text-sm mt-1">
-                          {fields.text.errors}
-                        </div>
-                      )}
                     </div>
-                  </div>
-
-                  <div className="flex flex-col space-y-6 md:flex-row md:space-y-0 md:space-x-8">
-                    {/* 过期时间选择 */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t('home.form.expiryTime.label')}
-                      </label>
-                      <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:gap-4">
-                        {expiryOptions.map((option) => (
-                          <label key={option.value} className="flex items-center">
-                            <input
-                              {...getInputProps(fields.expiryTime, { type: 'radio', value: option.value })}
-                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                            />
-                            <span className="ml-2 text-sm text-gray-700">{option.label}</span>
-                          </label>
-                        ))}
+                    {fields.text.errors && (
+                      <div className="text-red-600 text-sm mt-1">
+                        {fields.text.errors}
                       </div>
-                      {fields.expiryTime.errors && (
-                        <div className="text-red-600 text-sm mt-1">
-                          {fields.expiryTime.errors}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* 展示类型选择 */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        {t('home.form.displayType.label')}
-                      </label>
-                      <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:gap-4">
-                        <label className="flex items-center">
-                          <input
-                            {...getInputProps(fields.displayType, { type: 'radio', value: 'text' })}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                          />
-                          <span className="ml-2 text-sm text-gray-700">{t('home.form.displayType.text')}</span>
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <label className="flex items-center">
-                            <input
-                              {...getInputProps(fields.displayType, { type: 'radio', value: 'qrcode' })}
-                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                            />
-                            <span className="ml-2 text-sm text-gray-700">{t('home.form.displayType.qrcode')}</span>
-                          </label>
-                          {fields.displayType.value === 'qrcode' && (
-                            <button
-                              type="button"
-                              onClick={handleQRCodeReadClick}
-                              disabled={isProcessingQR}
-                              className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {isProcessingQR ? t('home.form.qrcode.processing') : t('home.form.qrcode.readFromQR')}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                      {fields.displayType.errors && (
-                        <div className="text-red-600 text-sm mt-1">
-                          {fields.displayType.errors}
-                        </div>
-                      )}
-                      
-                      {/* 隐藏的文件输入 */}
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleQRCodeUpload}
-                        className="hidden"
-                      />
-                    </div>
-                  </div>
-
-                  {/* 提交按钮 */}
-                  <button
-                    type="submit"
-                    disabled={isSubmitting || !(fields.text.value || '').trim()}
-                    className="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    {isSubmitting ? t('home.form.submit.creating') : t('home.form.submit.create')}
-                  </button>
-                </form>
-
-                {/* 历史记录入口 */}
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                  <div className="text-center">
-                    <button
-                      onClick={() => router.push('/history')}
-                      className="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
-                    >
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {t('home.form.history.button')}
-                      {shareHistory.length > 0 && (
-                        <span className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded-full">
-                          {shareHistory.length}
-                        </span>
-                      )}
-                    </button>
+                    )}
                   </div>
                 </div>
-              </div>
 
-              {/* Preview Section */}
-              <TextView
-                data={{
-                  id: 'preview',
-                  text: fields.text.value || t('home.preview.placeholder'),
-                  userName: fields.userName.value,
-                  displayType: fields.displayType.value as 'text' | 'qrcode' || 'text',
-                  createdAt: new Date().toISOString(),
-                  expiresAt: new Date(now.getTime() + getExpiryHours(fields.expiryTime.value || '1day') * 60 * 60 * 1000).toISOString()
-                } as TextData}
-                href={'https://example.com/t/preview-example'}
-                isPreview={true}
-              />
+                <div className="flex flex-col space-y-6 md:flex-row md:space-y-0 md:space-x-8">
+                  {/* 过期时间选择 */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('home.form.expiryTime.label')}
+                    </label>
+                    <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:gap-4">
+                      {expiryOptions.map((option) => (
+                        <label key={option.value} className="flex items-center">
+                          <input
+                            {...getInputProps(fields.expiryTime, { type: 'radio', value: option.value })}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          />
+                          <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                    {fields.expiryTime.errors && (
+                      <div className="text-red-600 text-sm mt-1">
+                        {fields.expiryTime.errors}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 展示类型选择 */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {t('home.form.displayType.label')}
+                    </label>
+                    <div className="flex flex-col space-y-3 md:flex-row md:space-y-0 md:gap-4">
+                      <label className="flex items-center">
+                        <input
+                          {...getInputProps(fields.displayType, { type: 'radio', value: 'text' })}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">{t('home.form.displayType.text')}</span>
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <label className="flex items-center">
+                          <input
+                            {...getInputProps(fields.displayType, { type: 'radio', value: 'qrcode' })}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                          />
+                          <span className="ml-2 text-sm text-gray-700">{t('home.form.displayType.qrcode')}</span>
+                        </label>
+                      </div>
+                    </div>
+                    {fields.displayType.errors && (
+                      <div className="text-red-600 text-sm mt-1">
+                        {fields.displayType.errors}
+                      </div>
+                    )}
+
+                    {/* 隐藏的文件输入 */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleQRCodeUpload}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+
+                {/* 提交按钮 */}
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !(fields.text.value || '').trim()}
+                  className="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isSubmitting ? t('home.form.submit.creating') : t('home.form.submit.create')}
+                </button>
+              </form>
+
+              {/* 历史记录入口 */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="text-center">
+                  <button
+                    onClick={() => router.push('/history')}
+                    className="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {t('home.form.history.button')}
+                    {shareHistory.length > 0 && (
+                      <span className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded-full">
+                        {shareHistory.length}
+                      </span>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview Section */}
+            <TextView
+              data={{
+                id: 'preview',
+                text: fields.text.value || t('home.preview.placeholder'),
+                userName: fields.userName.value,
+                displayType: fields.displayType.value as 'text' | 'qrcode' || 'text',
+                createdAt: new Date().toISOString(),
+                expiresAt: new Date(now.getTime() + getExpiryHours(fields.expiryTime.value || '1day') * 60 * 60 * 1000).toISOString()
+              } as TextData}
+              href={'https://example.com/t/preview-example'}
+              isPreview={true}
+            />
           </div>
         </div>
       </div>
